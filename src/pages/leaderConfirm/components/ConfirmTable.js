@@ -1,10 +1,10 @@
-import React from 'react';
-import { Table, Tag, Tooltip, Button, Modal, Form, Input, Radio, message, Select } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Table, Tag, Tooltip, Button, Modal, Form, Input, Radio, message, Select, Popconfirm } from 'antd';
 import { 
   CheckCircleOutlined, 
   QuestionCircleOutlined, 
   DownloadOutlined,
-  RollbackOutlined
+  EditOutlined
 } from '@ant-design/icons';
 import useAbnormalData from '../hooks/useAbnormalData';
 import useConfirmOperations from '../hooks/useConfirmOperations';
@@ -15,6 +15,10 @@ const { TextArea } = Input;
 const ConfirmTable = ({ searchParams }) => {
   const { data, loading, error, total, refresh } = useAbnormalData(searchParams);
   const [confirmForm] = Form.useForm();
+  const [editingReason, setEditingReason] = useState(null);
+  const [reasonText, setReasonText] = useState('');
+  // 添加本地保存的原因数据
+  const [localReasons, setLocalReasons] = useState({});
   
   // 使用分离出的hook
   const {
@@ -25,9 +29,20 @@ const ConfirmTable = ({ searchParams }) => {
     handleConfirmSubmit
   } = useConfirmOperations(refresh);
   
-  // 使用提交和撤回操作的hook
-  const { submitViolation, withdrawViolation } = useViolationActions(refresh);
+  // 使用提交操作的hook，传入本地原因数据
+  const { submitViolation } = useViolationActions(refresh, localReasons);
   
+  // 当数据刷新时，重置本地原因数据
+  useEffect(() => {
+    if (data && data.length > 0) {
+      const initialReasons = {};
+      data.forEach(item => {
+        initialReasons[item.id] = item.reason || '';
+      });
+      setLocalReasons(initialReasons);
+    }
+  }, [data]);
+
   // 显示错误信息
   React.useEffect(() => {
     if (error) {
@@ -39,10 +54,33 @@ const ConfirmTable = ({ searchParams }) => {
   const onConfirmSubmit = async () => {
     try {
       const values = await confirmForm.validateFields();
-      handleConfirmSubmit(values);
+      // 如果当前有编辑中的记录，将其原因添加到values中
+      if (editingReason && localReasons[editingReason]) {
+        values.reason = localReasons[editingReason];
+      }
+      handleConfirmSubmit(values, localReasons);
     } catch (error) {
       console.error('表单验证失败:', error);
     }
+  };
+
+  // 处理原因编辑
+  const handleReasonEdit = (record) => {
+    setEditingReason(record.id);
+    setReasonText(localReasons[record.id] || '');
+  };
+
+  // 保存原因到本地状态
+  const handleReasonSave = (record) => {
+    // 更新本地原因数据
+    setLocalReasons(prev => ({
+      ...prev,
+      [record.id]: reasonText
+    }));
+    
+    // 关闭编辑状态
+    setEditingReason(null);
+    message.success('原因已保存到本地，提交时将一并发送');
   };
 
   // 导出数据处理函数
@@ -56,14 +94,33 @@ const ConfirmTable = ({ searchParams }) => {
     const headers = columns.map(col => col.title).join(',');
     const rows = data.map(item => {
       return columns.map(col => {
+        let value = '';
+        
+        // 特殊处理某些列
         if (col.dataIndex === 'confirmed') {
-          return item.confirmed ? '已确认' : '未确认';
+          value = item.confirmed ? '已确认' : '未确认';
+        } else if (col.dataIndex === 'submitted') {
+          value = item.submitted ? '已提交' : '未提交';
+        } else {
+          // 获取原始值，如果为空则使用空字符串
+          value = item[col.dataIndex] || '';
+          
+          // 处理本地保存的原因
+          if (col.dataIndex === 'reason') {
+            value = localReasons[item.id] || value;
+          }
         }
-        if (col.dataIndex === 'submitted') {
-          return item.submitted ? '已提交' : '未提交';
+        
+        // 将值转换为字符串并处理特殊字符
+        const strValue = String(value);
+        
+        // 如果包含逗号、引号或换行符，需要用引号包裹并处理内部引号
+        if (strValue.includes(',') || strValue.includes('"') || strValue.includes('\n') || strValue.includes('\r')) {
+          // 将内部的引号替换为两个引号（CSV标准）
+          return `"${strValue.replace(/"/g, '""')}"`;
         }
-        const value = item[col.dataIndex] || '';
-        return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+        
+        return strValue;
       }).join(',');
     }).join('\n');
 
@@ -178,14 +235,48 @@ const ConfirmTable = ({ searchParams }) => {
       dataIndex: 'reason',
       key: 'reason',
       width: 150,
-      ellipsis: {
-        showTitle: false,
+      render: (text, record) => {
+        if (editingReason === record.id) {
+          return (
+            <div className="flex items-center">
+              <TextArea 
+                value={reasonText}
+                onChange={(e) => setReasonText(e.target.value)}
+                autoSize={{ minRows: 1, maxRows: 3 }}
+                style={{ width: '120px' }}
+              />
+              <Button 
+                type="link" 
+                size="small" 
+                onClick={() => handleReasonSave(record)}
+                className="ml-2"
+              >
+                保存
+              </Button>
+            </div>
+          );
+        }
+        
+        // 显示本地保存的原因或原始原因
+        const displayReason = localReasons[record.id] || text;
+        
+        return (
+          <div className="flex items-center">
+            <Tooltip placement="topLeft" title={displayReason || '暂无说明'}>
+              <span className="truncate max-w-[100px] inline-block">
+                {displayReason || <span className="text-gray-400">暂无说明</span>}
+              </span>
+            </Tooltip>
+            <Button 
+              type="link" 
+              icon={<EditOutlined />} 
+              size="small"
+              onClick={() => handleReasonEdit(record)}
+              className="ml-2"
+            />
+          </div>
+        );
       },
-      render: (text) => (
-        <Tooltip placement="topLeft" title={text || '暂无说明'}>
-          {text || <span className="text-gray-400">暂无说明</span>}
-        </Tooltip>
-      ),
     },
     {
       title: '是否提交',
@@ -198,28 +289,43 @@ const ConfirmTable = ({ searchParams }) => {
           <Tag icon={<QuestionCircleOutlined />} color="warning">未提交</Tag>
       ),
     },
+    // 表格列定义中的操作列
     {
       title: '操作',
       key: 'action',
-      width: 150, // 增加宽度以容纳两个按钮
-      render: (_, record) => (
-        record.submitted ? 
-          <Button 
-            type="link" 
-            icon={<RollbackOutlined />}
-            onClick={() => withdrawViolation(record)}
-            className="text-orange-500 p-0"
-          >
-            撤回
-          </Button> : 
+      width: 150,
+      render: (_, record) => {
+        const reason = localReasons[record.id] || record.reason || '';
+        const hasReason = reason.trim().length > 0;
+        
+        return hasReason ? (
           <Button 
             type="link" 
             onClick={() => submitViolation(record)}
             className="text-blue-500 p-0"
+            disabled={record.submitted} // 如果已提交则禁用按钮
           >
             提交
           </Button>
-      ),
+        ) : (
+          <Popconfirm
+            title="提交失败"
+            description="请先填写原因说明再提交"
+            okText="去填写"
+            cancelText="取消"
+            onConfirm={() => handleReasonEdit(record)}
+            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+          >
+            <Button 
+              type="link" 
+              className="text-blue-500 p-0"
+              disabled={record.submitted} // 如果已提交则禁用按钮
+            >
+              提交
+            </Button>
+          </Popconfirm>
+        );
+      },
     },
   ];
 
@@ -301,6 +407,7 @@ const ConfirmTable = ({ searchParams }) => {
           <Form.Item
             name="reason"
             label="原因说明"
+            rules={[{ required: true, message: '请输入异常原因说明' }]}
           >
             <TextArea 
               rows={4} 

@@ -25,16 +25,28 @@ const AbnormalTable = ({ searchParams }) => {
     const headers = columns.map(col => col.title).join(',');
     const rows = data.map(item => {
       return columns.map(col => {
-        // 处理特殊字段的显示
+        let value = '';
+        
+        // 特殊处理某些列
         if (col.dataIndex === 'confirmed') {
-          return item.confirmed ? '已确认' : '未确认';
+          value = item.confirmed ? '已确认' : '未确认';
+        } else if (col.dataIndex === 'submitted') {
+          value = item.submitted ? '已提交' : '未提交';
+        } else {
+          // 获取原始值，如果为空则使用空字符串
+          value = item[col.dataIndex] || '';
         }
-        if (col.dataIndex === 'submitted') {
-          return item.submitted ? '已提交' : '未提交';
+        
+        // 将值转换为字符串并处理特殊字符
+        const strValue = String(value);
+        
+        // 如果包含逗号、引号或换行符，需要用引号包裹并处理内部引号
+        if (strValue.includes(',') || strValue.includes('"') || strValue.includes('\n') || strValue.includes('\r')) {
+          // 将内部的引号替换为两个引号（CSV标准）
+          return `"${strValue.replace(/"/g, '""')}"`;
         }
-        // 处理可能包含逗号的字段，用双引号包裹
-        const value = item[col.dataIndex] || '';
-        return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+        
+        return strValue;
       }).join(',');
     }).join('\n');
 

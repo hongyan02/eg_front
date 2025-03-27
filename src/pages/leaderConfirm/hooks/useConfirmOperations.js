@@ -18,7 +18,10 @@ const useConfirmOperations = (refresh) => {
       const requestData = {
         id: String(record.id), // 确保 id 是字符串类型
         is_confirm: value === 'yes' ? '1' : '0',
-        user_name: record.employeeId // 使用当前数据的工号，而不是cookie值
+        user_name: record.employeeId, // 使用当前数据的工号，而不是cookie值
+        reason: record.reason || '', // 添加原因字段
+        // 如果API需要时间字段，使用原始格式
+        datetime: record.originalDatetime
       };
       
       console.log('更新确认状态:', requestData);
@@ -101,7 +104,7 @@ const useConfirmOperations = (refresh) => {
   };
 
   // 提交确认
-  const handleConfirmSubmit = async (values) => {
+  const handleConfirmSubmit = async (values, localReasons = {}) => {
     if (!currentRecord) return;
     
     try {
@@ -113,7 +116,10 @@ const useConfirmOperations = (refresh) => {
         user_name: currentRecord.employeeId,
         is_confirm: values.confirmed === 'yes' ? '1' : '0',
         is_submit: values.submitted === 'yes' ? '1' : '0',
-        reason: values.reason || ''
+        // 使用本地保存的原因或表单中的原因
+        reason: (localReasons[currentRecord.id] || values.reason || ''),
+        // 如果API需要时间字段，使用原始格式
+        datetime: currentRecord.originalDatetime
       };
       
       console.log('提交确认数据:', requestData);

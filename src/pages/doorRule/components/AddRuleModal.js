@@ -199,7 +199,7 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
           <Col span={10}>
             <Form.Item
               name="startTime"
-              label="开始时间"
+              label="稽查开始时间"
               rules={[{ required: false, message: '请选择开始时间' }]}
             >
               <TimePicker format="HH:mm:ss" placeholder="开始时间" style={{ width: '100%' }} />
@@ -208,7 +208,7 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
           <Col span={10}>
             <Form.Item
               name="endTime"
-              label="结束时间"
+              label="稽查结束时间"
               rules={[{ required: false, message: '请选择结束时间' }]}
             >
               <TimePicker format="HH:mm:ss" placeholder="结束时间" style={{ width: '100%' }} />
@@ -269,17 +269,7 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
           )}
         </Form.List>
         
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              name="reviewer"
-              label="审核人"
-              rules={[{ required: false, message: '请输入审核人' }]}
-            >
-              <Input placeholder="请输入审核人" />
-            </Form.Item>
-          </Col>
-        </Row>
+        {/* 移除审核人字段 */}
       </Form>
     </Modal>
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import useUserName from '../../../utils/cookie/useUserName';
+import { formatDateTime, formatDate } from '../../../utils/dateUtils';
 
 const useAbnormalData = (searchParams = {}) => {
   const [loading, setLoading] = useState(false);
@@ -53,19 +54,21 @@ const useAbnormalData = (searchParams = {}) => {
           name: item.nickname,
           department: item.dept_name || item.deptname || '未知部门',
           abnormalTime: item.exception_time,
-          exitTime: item.datetime,
+          exitTime: formatDateTime(item.datetime), // 仅用于显示
           exitAccessName: item.outdoor_name,
-          entryTime: item.datetime,
+          entryTime: formatDateTime(item.datetime), // 仅用于显示
           entryAccessId: item.door_code,
           abnormalRuleId: item.rule_id,
           departmentManager: item.leader,
           confirmed: item.is_confirm === "1",
           reason: item.reason || "",
           submitted: item.is_submit === "1",
-          abnormalDate: new Date(item.datetime).toLocaleDateString(),
+          abnormalDate: formatDate(item.datetime), // 仅用于显示
           doorArea: item.door_area,
           doorType: item.door_type,
-          leaderId: item.leader_id
+          leaderId: item.leader_id,
+          // 保存原始时间格式用于API提交
+          originalDatetime: item.datetime
         }));
         
         setData(formattedData);
