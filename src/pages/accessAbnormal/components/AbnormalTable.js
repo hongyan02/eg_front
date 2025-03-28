@@ -147,7 +147,7 @@ const AbnormalTable = ({ searchParams }) => {
       title: '部门负责人',
       dataIndex: 'departmentManager',
       key: 'departmentManager',
-      width: 100,
+      width: 110,
     },
     {
       title: '异常确认',

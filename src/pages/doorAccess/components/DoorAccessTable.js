@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Table, Button, Space, Pagination, Popconfirm } from 'antd';
-import {DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 
 const DoorAccessTable = ({ 
   doorData = [], // 提供默认空数组
@@ -26,6 +26,12 @@ const DoorAccessTable = ({
     const types = [...new Set(safeData.map(item => item.door_type).filter(Boolean))];
     return types.map(type => ({ text: type, value: type }));
   }, [safeData]);
+
+  // 动态生成进出类型的筛选选项
+  const inOutFilters = useMemo(() => [
+    { text: '进门', value: '1' },
+    { text: '出门', value: '0' }
+  ], []);
 
   const columns = useMemo(() => [
     {
@@ -55,6 +61,15 @@ const DoorAccessTable = ({
       width: 120,
       filters: typeFilters,
       onFilter: (value, record) => record.door_type === value,
+    },
+    {
+      title: '进出类型',
+      dataIndex: 'in_out_type',
+      key: 'in_out_type',
+      width: 100,
+      filters: inOutFilters,
+      onFilter: (value, record) => record.in_out_type === value,
+      render: (text) => text === '1' ? '进门' : (text === '0' ? '出门' : '未知'),
     },
     {
       title: 'IP 地址',
@@ -99,26 +114,35 @@ const DoorAccessTable = ({
         </Space>
       ),
     },
-  ], [areaFilters, typeFilters, onEdit, onDelete]); 
+  ], [areaFilters, typeFilters, inOutFilters, onEdit, onDelete]);
 
   return (
     <div className="bg-white p-4 rounded shadow">
-      
+      <div className="flex justify-between items-center mb-4">
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          onClick={onAddDoor}
+          className="bg-blue-500"
+        >
+          新增门禁
+        </Button>
+      </div>
       <Table
         columns={columns}
         dataSource={safeData}
-        rowKey="door_area"
         loading={loading}
         pagination={false}
-        className="mb-4"
+        scroll={{ x: 1200 }}
+        rowKey="door_code"
       />
-      
-      <div className="flex justify-end">
+      <div className="mt-4 flex justify-end">
         <Pagination
           current={currentPage}
           onChange={onPageChange}
           total={safeData.length}
           showSizeChanger={false}
+          showTotal={(total) => `共 ${total} 条记录`}
         />
       </div>
     </div>

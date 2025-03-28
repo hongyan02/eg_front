@@ -2,6 +2,7 @@ import useDoorData from './useDoorData';
 import useDoorSearch from './useDoorSearch';
 import useEditDoor from './useEditDoor';
 import useDeleteDoor from './useDeleteDoor';
+import useAddDoor from './useAddDoor';
 import { useEffect, useState } from 'react';
 
 function useDoorAccess() {
@@ -77,11 +78,20 @@ function useDoorAccess() {
   const {
     editModalVisible,
     currentRecord,
-    confirmLoading,
+    confirmLoading: editConfirmLoading,
     handleEdit,
     handleEditCancel,
     handleEditSubmit
   } = useEditDoor(fetchDoorData); // 传入 fetchDoorData 函数
+
+  // 使用新增门禁 hook
+  const {
+    addModalVisible,
+    confirmLoading: addConfirmLoading,
+    handleAddDoor,
+    handleAddCancel,
+    handleAddSubmit
+  } = useAddDoor(fetchDoorData);
 
   // 包装编辑提交函数，添加本地数据更新
   const wrappedHandleEditSubmit = async (values) => {
@@ -100,31 +110,29 @@ function useDoorAccess() {
   } = useDeleteDoor(doorData, setDoorData, fetchDoorData);
 
   // 包装删除函数，确保同时更新 filteredData
-  const wrappedHandleDelete = async (doorCode) => {
-    await handleDelete(doorCode);
-    // 删除后同步更新 filteredData
-    if (filteredData.length > 0) {
-      initData(doorData.filter(item => item.door_code !== doorCode));
-    }
+  const wrappedHandleDelete = async (key) => {
+    await handleDelete(key);
   };
 
-  // 使用过滤后的数据作为展示数据，但确保在搜索后返回实际的过滤结果
-  const displayData = hasSearched ? filteredData : (filteredData.length > 0 ? filteredData : doorData);
-
   return {
-    doorData: displayData, // 返回过滤后的数据
-    loading: loading || deleteLoading,
+    doorData: hasSearched ? filteredData : doorData,
+    loading,
     currentPage,
     form,
     editModalVisible,
     currentRecord,
-    confirmLoading,
-    handleSearch: wrappedHandleSearch, // 使用包装后的搜索函数
-    handleReset: wrappedHandleReset, // 使用包装后的重置函数
+    editConfirmLoading,
+    addModalVisible,
+    addConfirmLoading,
+    handleSearch: wrappedHandleSearch,
+    handleReset: wrappedHandleReset,
+    handleAddDoor,
+    handleAddCancel,
+    handleAddSubmit,
     handleEdit,
     handleEditCancel,
-    handleEditSubmit: wrappedHandleEditSubmit, // 使用包装后的编辑提交函数
-    handleDelete: wrappedHandleDelete, // 使用包装后的删除函数
+    handleEditSubmit: wrappedHandleEditSubmit,
+    handleDelete: wrappedHandleDelete,
     handlePageChange
   };
 }

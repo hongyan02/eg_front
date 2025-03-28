@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Form, Select, Button, Space, Input } from 'antd';
+import { Form, Select, Button, Space, Input, Row, Col } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -33,65 +33,92 @@ const DoorAccessSearch = ({ form, onSearch, onReset, doorData = [] }) => {
       form={form}
       layout="inline"
       onFinish={onSearch}
-      className="flex items-center flex-wrap"
+      className="w-full"
     >
-      <Form.Item name="doorNumber" label="门禁编号" className="mb-2">
-        <Input 
-          placeholder="请输入门禁编号" 
-          style={{ width: '320px' }}
-          allowClear
-        />
-      </Form.Item>
-      <Form.Item name="area" label="门禁区域" className="mb-2">
-        <Select 
-          placeholder="全部" 
-          style={{ width: '320px' }}
-          allowClear
-        >
-          <Option value="">全部</Option>
-          {allAreaOptions && allAreaOptions.length > 0 ? (
-            allAreaOptions.map(option => (
-              <Option key={option.value} value={option.value}>
-                {option.text}
-              </Option>
-            ))
-          ) : null}
-        </Select>
-      </Form.Item>
-      <Form.Item name="type" label="门禁类型" className="mb-2">
-        <Select 
-          placeholder="全部" 
-          style={{ width: '320px' }}
-          allowClear
-        >
-          <Option value="">全部</Option>
-          {allTypeOptions && allTypeOptions.length > 0 ? (
-            allTypeOptions.map(option => (
-              <Option key={option.value} value={option.value}>
-                {option.text}
-              </Option>
-            ))
-          ) : null}
-        </Select>
-      </Form.Item>
-      <Form.Item className="mb-2">
-        <Space>
-          <Button 
-            type="primary" 
-            htmlType="submit" 
-            icon={<SearchOutlined />}
-            className="bg-blue-500"
-          >
-            查询
-          </Button>
-          <Button 
-            icon={<ReloadOutlined />}
-            onClick={onReset}
-          >
-            重置
-          </Button>
-        </Space>
-      </Form.Item>
+      <Row gutter={[16, 16]} className="w-full">
+        <Col xs={24} sm={12} md={6} lg={5} xl={5}>
+          <Form.Item name="doorNumber" label="门禁编号" className="w-full">
+            <Input 
+              placeholder="请输入门禁编号" 
+              allowClear
+              className="w-full"
+            />
+          </Form.Item>
+        </Col>
+        
+        <Col xs={24} sm={12} md={6} lg={5} xl={5}>
+          <Form.Item name="area" label="门禁区域" className="w-full">
+            <Select 
+              placeholder="全部" 
+              allowClear
+              className="w-full"
+            >
+              <Option value="">全部</Option>
+              {allAreaOptions && allAreaOptions.length > 0 ? (
+                allAreaOptions.map(option => (
+                  <Option key={option.value} value={option.value}>
+                    {option.text}
+                  </Option>
+                ))
+              ) : null}
+            </Select>
+          </Form.Item>
+        </Col>
+        
+        <Col xs={24} sm={12} md={6} lg={5} xl={5}>
+          <Form.Item name="type" label="门禁类型" className="w-full">
+            <Select 
+              placeholder="全部" 
+              allowClear
+              className="w-full"
+            >
+              <Option value="">全部</Option>
+              {allTypeOptions && allTypeOptions.length > 0 ? (
+                allTypeOptions.map(option => (
+                  <Option key={option.value} value={option.value}>
+                    {option.text}
+                  </Option>
+                ))
+              ) : null}
+            </Select>
+          </Form.Item>
+        </Col>
+        
+        <Col xs={24} sm={12} md={6} lg={5} xl={5}>
+          <Form.Item name="inOutType" label="进出类型" className="w-full">
+            <Select 
+              placeholder="全部" 
+              allowClear
+              className="w-full"
+            >
+              <Option value="">全部</Option>
+              <Option value="1">进门</Option>
+              <Option value="0">出门</Option>
+            </Select>
+          </Form.Item>
+        </Col>
+        
+        <Col xs={24} sm={24} md={24} lg={4} xl={4} className="flex justify-end">
+          <Form.Item>
+            <Space>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                icon={<SearchOutlined />}
+                className="bg-blue-500"
+              >
+                查询
+              </Button>
+              <Button 
+                icon={<ReloadOutlined />}
+                onClick={onReset}
+              >
+                重置
+              </Button>
+            </Space>
+          </Form.Item>
+        </Col>
+      </Row>
     </Form>
   );
 };

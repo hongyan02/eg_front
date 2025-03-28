@@ -3,6 +3,7 @@ import { Layout, ConfigProvider } from 'antd';
 import DoorAccessSearch from './components/DoorAccessSearch';
 import DoorAccessTable from './components/DoorAccessTable';
 import EditDoorModal from './components/EditDoorModal';
+import AddDoorModal from './components/AddDoorModal';
 import useDoorAccess from './hooks/useDoorAccess';
 
 const { Header, Content } = Layout;
@@ -15,10 +16,14 @@ const DoorAccessManagement = () => {
     form,
     editModalVisible,
     currentRecord,
-    confirmLoading,
+    editConfirmLoading,
+    addModalVisible,
+    addConfirmLoading,
     handleSearch,
     handleReset,
     handleAddDoor,
+    handleAddCancel,
+    handleAddSubmit,
     handleEdit,
     handleEditCancel,
     handleEditSubmit,
@@ -65,8 +70,18 @@ const DoorAccessManagement = () => {
             visible={editModalVisible}
             onCancel={handleEditCancel}
             onSubmit={handleEditSubmit}
-            confirmLoading={confirmLoading}
+            confirmLoading={editConfirmLoading}
             record={currentRecord}
+            areaOptions={areaOptions}
+            typeOptions={typeOptions}
+          />
+          
+          {/* 新增门禁模态框 */}
+          <AddDoorModal
+            visible={addModalVisible}
+            onCancel={handleAddCancel}
+            onSubmit={handleAddSubmit}
+            confirmLoading={addConfirmLoading}
             areaOptions={areaOptions}
             typeOptions={typeOptions}
           />

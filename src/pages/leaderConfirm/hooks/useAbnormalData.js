@@ -29,8 +29,8 @@ const useAbnormalData = (searchParams = {}) => {
         dept_id: searchParams.dept_id || "",
         is_confirm: searchParams.is_confirm || "",
         is_submit: searchParams.is_submit || "",
-        query_user_name: searchParams.username || "", // 修改为 query_user_name
-        user_name: userName // 使用 cookie 中的用户工号
+        query_user_name: searchParams.username || "", 
+        user_name: userName 
       };
       
       console.log('请求参数:', requestBody);
@@ -53,7 +53,8 @@ const useAbnormalData = (searchParams = {}) => {
           employeeId: item.username,
           name: item.nickname,
           department: item.dept_name || item.deptname || '未知部门',
-          abnormalTime: item.exception_time,
+          // 使用 formatDateTime 格式化异常时间
+          abnormalTime: formatDateTime(item.exception_time),
           exitTime: formatDateTime(item.datetime), // 仅用于显示
           exitAccessName: item.outdoor_name,
           entryTime: formatDateTime(item.datetime), // 仅用于显示
@@ -68,7 +69,9 @@ const useAbnormalData = (searchParams = {}) => {
           doorType: item.door_type,
           leaderId: item.leader_id,
           // 保存原始时间格式用于API提交
-          originalDatetime: item.datetime
+          originalDatetime: item.datetime,
+          // 保存原始异常时间格式用于API提交
+          originalExceptionTime: item.exception_time
         }));
         
         setData(formattedData);

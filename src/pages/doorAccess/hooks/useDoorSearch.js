@@ -35,6 +35,11 @@ function useDoorSearch(fetchDoorData, setLoading) {
         return false;
       }
       
+      // 进出类型搜索 (精确匹配)
+      if (values.inOutType && item.in_out_type !== values.inOutType) {
+        return false;
+      }
+      
       return true;
     });
     

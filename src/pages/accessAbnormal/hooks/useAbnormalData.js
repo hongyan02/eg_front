@@ -20,7 +20,7 @@ const useAbnormalData = (searchParams = {}) => {
         dept_id: searchParams.dept_id || "",  // 这里应该已经是最后一级部门ID
         is_confirm: searchParams.is_confirm || "",
         is_submit: searchParams.is_submit || "",
-        username: searchParams.username || ""
+        query_user_name: searchParams.username || ""  // 修改参数名为query_user_name
       };
       
       console.log('请求参数:', requestBody); // 添加日志查看请求参数
@@ -41,21 +41,26 @@ const useAbnormalData = (searchParams = {}) => {
           id: item.id,
           employeeId: item.username,
           name: item.nickname,
-          department: item.dept_name || item.deptname || '未知部门', // 修改这里，使用dept_name而不是dept_id
-          abnormalTime: item.exception_time,
-          exitTime: formatDateTime(item.datetime), // 使用格式化函数
+          department: item.dept_name || item.deptname || '未知部门',
+          // 使用 formatDateTime 格式化异常时间
+          abnormalTime: formatDateTime(item.exception_time),
+          exitTime: formatDateTime(item.datetime),
           exitAccessName: item.outdoor_name,
-          entryTime: formatDateTime(item.datetime), // 使用格式化函数
+          entryTime: formatDateTime(item.datetime),
           entryAccessId: item.door_code,
           abnormalRuleId: item.rule_id,
           departmentManager: item.leader,
           confirmed: item.is_confirm === "1",
-          reason: item.reason || "", // 使用API返回的reason字段
+          reason: item.reason || "",
           submitted: item.is_submit === "1",
-          abnormalDate: formatDate(item.datetime), // 使用格式化函数
+          abnormalDate: formatDate(item.datetime),
           doorArea: item.door_area,
           doorType: item.door_type,
-          leaderId: item.leader_id
+          leaderId: item.leader_id,
+          // 保存原始时间格式用于API提交
+          originalDatetime: item.datetime,
+          // 保存原始异常时间格式用于API提交
+          originalExceptionTime: item.exception_time
         }));
         
         setData(formattedData);

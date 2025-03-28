@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, TimePicker, Button, Checkbox, Row, Col } from 'antd';
+import { Modal, Form, Input, TimePicker, Button, Checkbox, Row, Col, Select } from 'antd';
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 const { TextArea } = Input;
-const CheckboxGroup = Checkbox.Group;
+const { Option } = Select;
 
 // 定义职级选项
 const levelOptions = [
@@ -169,7 +169,7 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
           </Col>
         </Row>
         
-        {/* 添加职级复选框 */}
+        {/* 添加职级下拉框 */}
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
@@ -177,12 +177,23 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
               label="适用职级"
               rules={[{ required: false, message: '请选择适用职级' }]}
             >
-              <CheckboxGroup options={levelOptions} />
+              <Select
+                mode="multiple"
+                placeholder="请选择适用职级"
+                style={{ width: '100%' }}
+                allowClear
+              >
+                {levelOptions.map(option => (
+                  <Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
           </Col>
         </Row>
         
-        {/* 添加排班复选框 */}
+        {/* 添加排班下拉框 */}
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
@@ -190,7 +201,18 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
               label="适用排班"
               rules={[{ required: false, message: '请选择适用排班' }]}
             >
-              <CheckboxGroup options={scheduleOptions} />
+              <Select
+                mode="multiple"
+                placeholder="请选择适用排班"
+                style={{ width: '100%' }}
+                allowClear
+              >
+                {scheduleOptions.map(option => (
+                  <Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
           </Col>
         </Row>

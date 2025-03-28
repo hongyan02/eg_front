@@ -3,28 +3,19 @@ import { Modal, Form, Input, Select, Row, Col, Button } from 'antd';
 
 const { Option } = Select;
 
-const EditDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, record, areaOptions, typeOptions }) => {
+const AddDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, areaOptions, typeOptions }) => {
   const [form] = Form.useForm();
 
-  // 当记录变化时，重置表单数据
   useEffect(() => {
-    if (visible && record) {
-      form.setFieldsValue({
-        door_code: record.door_code,
-        door_name: record.door_name,
-        door_area: record.door_area,
-        door_type: record.door_type,
-        in_out_type: record.in_out_type,
-        ip_address: record.ip_address,
-        remark: record.remark || ''
-      });
+    if (visible) {
+      form.resetFields();
     }
-  }, [visible, record, form]);
+  }, [visible, form]);
 
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      onSubmit({ ...values, id: record?.id });
+      onSubmit(values);
     } catch (error) {
       console.error('表单验证失败:', error);
     }
@@ -37,7 +28,7 @@ const EditDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, record, ar
 
   return (
     <Modal
-      title="编辑门禁"
+      title="新增门禁"
       open={visible}
       onCancel={handleCancel}
       maskClosable={false}
@@ -70,7 +61,7 @@ const EditDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, record, ar
               label="门禁编号"
               rules={[{ required: true, message: '请输入门禁编号' }]}
             >
-              <Input placeholder="请输入门禁编号" disabled />
+              <Input placeholder="请输入门禁编号" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -98,7 +89,9 @@ const EditDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, record, ar
                       {option.text}
                     </Option>
                   ))
-                ) : null}
+                ) : (
+                  <Option value="新区域">新区域</Option>
+                )}
               </Select>
             </Form.Item>
           </Col>
@@ -151,4 +144,4 @@ const EditDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, record, ar
   );
 };
 
-export default EditDoorModal;
+export default AddDoorModal;
