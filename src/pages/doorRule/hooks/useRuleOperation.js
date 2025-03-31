@@ -257,11 +257,53 @@ const useRuleOperation = (onSuccess, onError) => {
     }
   }, [onSuccess, onError, userName]); // 添加 userName 作为依赖项
 
+  // 废弃规则
+  const discardRule = useCallback(async (ruleId) => {
+    try {
+      console.log('废弃规则:', ruleId, '用户:', userName);
+      
+      // 构建请求数据
+      const requestData = {
+        rule_id: ruleId,
+        user_name: userName
+      };
+      
+      // 发送请求
+      const response = await fetch('http://10.22.161.62:8083/api/rule/discard', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+      
+      const result = await response.json();
+      console.log('废弃规则响应:', result);
+      
+      // 判断请求是否成功
+      if (response.ok) {
+        // 请求成功
+        if (onSuccess) onSuccess(result);
+        return { success: true, data: result };
+      } else {
+        // 请求失败
+        const errorMsg = result.message || '废弃规则失败';
+        if (onError) onError(errorMsg);
+        return { success: false, error: errorMsg };
+      }
+    } catch (error) {
+      console.error('废弃规则异常:', error);
+      if (onError) onError(error.message || '废弃规则异常');
+      return { success: false, error };
+    }
+  }, [onSuccess, onError, userName]);
+
   return {
     createRule,
     updateRule,
     commitRule,
-    withdrawRule // 导出撤回规则函数
+    withdrawRule,
+    discardRule  // 确保这里返回了 discardRule
   };
 };
 

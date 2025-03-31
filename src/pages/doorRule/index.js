@@ -4,7 +4,7 @@ import DoorRuleSearch from './components/DoorRuleSearch';
 import DoorRuleTable from './components/DoorRuleTable';
 import AddRuleModal from './components/AddRuleModal';
 import AuditModal from './components/AuditModal';
-import RuleDetailModal from './components/RuleDetailModal'; // 导入详情模态框
+import RuleDetailModal from './components/RuleDetailModal';
 import useDoorRule from './hooks/useDoorRule';
 
 const { Content } = Layout;
@@ -22,8 +22,8 @@ const DoorRuleManagement = () => {
     auditModalVisible,
     auditData,
     auditLoading,
-    detailModalVisible, // 添加详情模态框可见状态
-    detailRecord, // 添加详情记录
+    detailModalVisible,
+    detailRecord,
     handleSearch,
     handleStatusChange,
     handlePageChange,
@@ -38,8 +38,9 @@ const DoorRuleManagement = () => {
     handleApprove,
     handleReject,
     handleAuditModalCancel,
-    handleViewDetail, // 添加查看详情处理函数
-    handleDetailModalCancel // 添加详情模态框关闭处理函数
+    handleViewDetail,
+    handleDetailModalCancel,
+    handleDiscard  // 添加废弃处理函数
   } = useDoorRule();
 
   return (
@@ -64,7 +65,8 @@ const DoorRuleManagement = () => {
             onAdd={handleAdd}
             onSubmit={handleSubmitRule}
             onMyAudit={handleMyAudit}
-            onViewDetail={handleViewDetail} // 添加查看详情处理函数
+            onViewDetail={handleViewDetail}
+            onDiscard={handleDiscard}  // 传递废弃处理函数
           />
           
           <AddRuleModal 
@@ -85,7 +87,6 @@ const DoorRuleManagement = () => {
             loading={auditLoading}
           />
           
-          {/* 添加规则详情模态框 */}
           <RuleDetailModal
             visible={detailModalVisible}
             onCancel={handleDetailModalCancel}

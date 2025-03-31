@@ -3,8 +3,8 @@ import { message } from 'antd';
 import usePagination from './usePagination';
 import useSearch from './useSearch';
 import useRuleOperation from './useRuleOperation';
-import useAudit from './useAudit'; // 引入审核 hook
-import useUserName from '../../../utils/cookie/useUserName'; // 引入工号 hook
+import useAudit from './useAudit'; 
+import useUserName from '../../../utils/cookie/useUserName'; 
 
 const useDoorRule = () => {
   // 基础状态管理
@@ -116,7 +116,7 @@ const useDoorRule = () => {
   }, []);
 
   // 使用规则操作 hook
-  const { createRule, updateRule, commitRule, withdrawRule } = useRuleOperation(
+  const { createRule, updateRule, commitRule, withdrawRule, discardRule } = useRuleOperation(
     handleOperationSuccess,
     handleOperationError
   );
@@ -302,7 +302,29 @@ const useDoorRule = () => {
       setLoading(false);
     }
   }, [commitRule, userName]); // 添加 userName 作为依赖项
-  
+
+  // 处理废弃规则
+  const handleDiscard = useCallback(async (record) => {
+    if (!record || !record.ruleNumber) {
+      message.error('规则单号不能为空');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const result = await discardRule(record.ruleNumber);
+      if (result.success) {
+        message.success('规则废弃成功');
+        fetchRuleData(); // 刷新数据
+      }
+    } catch (error) {
+      console.error('废弃规则失败:', error);
+      message.error('废弃规则失败: ' + (error.message || '未知错误'));
+    } finally {
+      setLoading(false);
+    }
+  }, [discardRule, fetchRuleData]);
+
   return {
     loading,
     ruleData: paginatedData, 
@@ -335,6 +357,7 @@ const useDoorRule = () => {
     handleModalSubmit,
     handleSubmitRule,
     handleViewDetail,
+    handleDiscard,
     handleDetailModalCancel
   };
 };

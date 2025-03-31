@@ -1,6 +1,6 @@
 import React from 'react';
-import { Table, Button, Space, Pagination, Tag } from 'antd';
-import { UndoOutlined, EditOutlined, PlusOutlined, SendOutlined, AuditOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Pagination, Tag, Popconfirm } from 'antd';
+import { UndoOutlined, EditOutlined, PlusOutlined, SendOutlined, AuditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const DoorRuleTable = ({ 
   ruleData, 
@@ -15,7 +15,8 @@ const DoorRuleTable = ({
   onAdd,
   onSubmit,
   onMyAudit,
-  onViewDetail // 添加查看详情处理函数
+  onViewDetail,
+  onDiscard  // 确保这里有定义 onDiscard 属性
 }) => {
   // 状态标签渲染
   const renderStatus = (status) => {
@@ -82,7 +83,7 @@ const DoorRuleTable = ({
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 250,  // 增加宽度以容纳新按钮
       render: (_, record) => (
         <Space size="middle">
           <Button 
@@ -112,6 +113,22 @@ const DoorRuleTable = ({
           >
             编辑
           </Button>
+          {/* 添加废弃按钮 */}
+          <Popconfirm
+            title="确定要废弃此规则吗？"
+            onConfirm={() => onDiscard && onDiscard(record)}  // 添加空检查
+            okText="确定"
+            cancelText="取消"
+          >
+            <Button 
+              type="link" 
+              icon={<DeleteOutlined />}
+              disabled={record.status === 'cancelled'}
+              className="text-red-500 p-0"
+            >
+              废弃
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
