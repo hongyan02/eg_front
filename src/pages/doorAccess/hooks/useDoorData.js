@@ -22,11 +22,14 @@ function useDoorData() {
       if (result && Array.isArray(result.data)) {
         // 处理门禁类型：1 -> 园区门禁，0 -> 车间门禁
         // 处理进出类型：1 -> 进门，0 -> 出门
+        // 处理状态：0 -> 启用，1 -> 禁用
         const processedData = result.data.map(item => ({
           ...item,
           key: item.door_code, // 添加唯一key，用于删除操作
           door_type: item.door_type === '0' ? '园区门禁' : '车间门禁',
-          in_out_type: item.in_out_type || '' // 确保即使API没有返回该字段也不会报错
+          in_out_type: item.in_out_type || '', // 确保即使API没有返回该字段也不会报错
+          status: item.status || '0', // 默认为启用状态
+          statusText: item.status === '1' ? '禁用' : '启用'
         }));
         
         setDoorData(processedData);

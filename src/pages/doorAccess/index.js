@@ -28,7 +28,8 @@ const DoorAccessManagement = () => {
     handleEditCancel,
     handleEditSubmit,
     handleDelete,
-    handlePageChange
+    handlePageChange,
+    handleStatusToggle // 添加状态切换处理函数
   } = useDoorAccess();
 
   // 提取所有唯一的门禁区域和类型选项
@@ -63,6 +64,7 @@ const DoorAccessManagement = () => {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onPageChange={handlePageChange}
+            onStatusToggle={handleStatusToggle} // 传递状态切换处理函数
           />
           
           {/* 编辑门禁模态框 */}

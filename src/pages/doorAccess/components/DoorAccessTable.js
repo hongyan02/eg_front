@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Table, Button, Space, Pagination, Popconfirm } from 'antd';
+import { Table, Button, Space, Pagination, Popconfirm, Switch, Tooltip } from 'antd';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 
 const DoorAccessTable = ({ 
@@ -9,7 +9,8 @@ const DoorAccessTable = ({
   onAddDoor, 
   onEdit, 
   onDelete, 
-  onPageChange 
+  onPageChange,
+  onStatusToggle // 添加状态切换处理函数
 }) => {
   // 使用 useMemo 确保 doorData 是数组，避免每次渲染创建新引用
   const safeData = useMemo(() => {
@@ -77,11 +78,23 @@ const DoorAccessTable = ({
       key: 'ip_address',
       width: 150,
     },
+    // 添加状态列
     {
-      title: '备注',
-      dataIndex: 'remark',
-      key: 'remark',
-      width: 150,
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (status, record) => (
+        <Tooltip title={status === '0' ? '启用' : '禁用'}>
+          <Switch
+            checked={status === '0'}
+            onChange={(checked) => onStatusToggle && onStatusToggle(record, checked)}
+            loading={loading && record.loadingStatus}
+            checkedChildren="启用"
+            unCheckedChildren="禁用"
+          />
+        </Tooltip>
+      ),
     },
     {
       title: '操作',
@@ -91,22 +104,23 @@ const DoorAccessTable = ({
         <Space size="middle">
           <Button 
             type="link" 
-            icon={<EditOutlined />}
-            onClick={() => onEdit(record)} 
+            icon={<EditOutlined />} 
+            onClick={() => onEdit(record)}
             className="text-blue-500 p-0"
           >
             编辑
           </Button>
           <Popconfirm
-            title="确定要删除这条门禁记录吗?"
-            onConfirm={() => onDelete(record.door_code || record.key)}
+            title="确定要删除此门禁吗？"
+            onConfirm={() => onDelete(record.door_code)}
             okText="确定"
             cancelText="取消"
           >
             <Button 
               type="link" 
+              danger 
               icon={<DeleteOutlined />}
-              className="text-red-500 p-0"
+              className="p-0"
             >
               删除
             </Button>
@@ -114,7 +128,7 @@ const DoorAccessTable = ({
         </Space>
       ),
     },
-  ], [areaFilters, typeFilters, inOutFilters, onEdit, onDelete]);
+  ], [onEdit, onDelete, onStatusToggle, loading, areaFilters, typeFilters, inOutFilters]);
 
   return (
     <div className="bg-white p-4 rounded shadow">

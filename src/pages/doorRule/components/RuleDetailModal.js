@@ -79,42 +79,96 @@ const RuleDetailModal = ({ visible, onCancel, record }) => {
     return days.length > 0 ? days.join(', ') : '-';
   };
 
+  // 渲染例外时间段
+  // 添加例外时间段的显示
+  const renderExceptionTimes = () => {
+    if (!record.rawData?.exception_time || !Array.isArray(record.rawData.exception_time) || record.rawData.exception_time.length === 0) {
+      return <span>无</span>;
+    }
+    
+    return (
+      <div>
+        {record.rawData.exception_time.map((item, index) => (
+          <div key={index} className="mb-2">
+            <div>开始时间: {item.start || '-'}</div>
+            <div>结束时间: {item.end || '-'}</div>
+            <div>说明: {item.explain || '-'}</div>
+            {index < record.rawData.exception_time.length - 1 && <Divider style={{ margin: '8px 0' }} />}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // 处理是否跨天的显示
+  const getIsCrossDay = () => {
+    // 优先使用记录中的 isCrossDay 字段
+    if (record.isCrossDay !== undefined) {
+      return record.isCrossDay ? '是' : '否';
+    }
+    
+    // 如果原始数据中有 is_cross_day 字段
+    if (record.rawData?.is_cross_day !== undefined) {
+      return record.rawData.is_cross_day === 1 ? '是' : '否';
+    }
+    
+    // 根据开始时间和时间差计算是否跨天
+    if (record.rawData?.start_time && record.rawData?.time_diff) {
+      const [startHours, startMinutes] = record.rawData.start_time.split(':').map(Number);
+      const [diffHours, diffMinutes] = record.rawData.time_diff.split(':').map(Number);
+      
+      // 计算总分钟数
+      const startTotalMinutes = startHours * 60 + startMinutes;
+      const diffTotalMinutes = diffHours * 60 + diffMinutes;
+      
+      // 如果开始时间加上时间差超过24小时（1440分钟），则为跨天
+      return (startTotalMinutes + diffTotalMinutes) >= 1440 ? '是' : '否';
+    }
+    
+    // 如果以上都没有，则根据开始时间和结束时间计算
+    if (record.startTime && record.endTime) {
+      const [startHours, startMinutes] = record.startTime.split(':').map(Number);
+      const [endHours, endMinutes] = record.endTime.split(':').map(Number);
+      
+      const startTotalMinutes = startHours * 60 + startMinutes;
+      const endTotalMinutes = endHours * 60 + endMinutes;
+      
+      // 如果结束时间小于开始时间，则认为是跨天
+      return endTotalMinutes < startTotalMinutes ? '是' : '否';
+    }
+    
+    return '-';
+  };
+
   return (
     <Modal
-      title="门禁规则详情"
+      title="规则详情"
       open={visible}
       onCancel={onCancel}
       footer={null}
       width={700}
-      maskClosable={false}
     >
       <Descriptions bordered column={2}>
-        <Descriptions.Item label="规则单号" span={2}>{record.ruleNumber || '-'}</Descriptions.Item>
+        <Descriptions.Item label="规则单号" span={2}>{record.ruleNumber || record.rule_id || '-'}</Descriptions.Item>
         <Descriptions.Item label="状态">{renderStatus(record.status)}</Descriptions.Item>
         <Descriptions.Item label="审批日期">{record.approvalDate || '-'}</Descriptions.Item>
         <Descriptions.Item label="门禁区域">{getDoorArea()}</Descriptions.Item>
         <Descriptions.Item label="门禁名称">{getDoorName()}</Descriptions.Item>
-      </Descriptions>
-
-      <Divider />
-
-      <Descriptions bordered column={2}>
-        <Descriptions.Item label="开始时间">{record.rawData?.start_time || '-'}</Descriptions.Item>
-        <Descriptions.Item label="结束时间">{record.rawData?.end_time || '-'}</Descriptions.Item>
-        <Descriptions.Item label="是否跨天">{record.rawData?.is_cross_day === 1 ? '是' : '否'}</Descriptions.Item>
-        <Descriptions.Item label="时间差">{record.rawData?.time_diff || '-'}</Descriptions.Item>
+        <Descriptions.Item label="规则说明" span={2}>{record.description || record.rule_explanation || '-'}</Descriptions.Item>
         <Descriptions.Item label="适用职级">{getAssessmentLevel()}</Descriptions.Item>
         <Descriptions.Item label="适用排班">{getSchedule()}</Descriptions.Item>
-      </Descriptions>
-
-      <Divider />
-
-      <Descriptions bordered column={2}>
-        <Descriptions.Item label="规则说明" span={2}>{record.description || '-'}</Descriptions.Item>
-        <Descriptions.Item label="编制人">{record.creator || '-'}</Descriptions.Item>
-        <Descriptions.Item label="审核人">{record.reviewer || '-'}</Descriptions.Item>
-        <Descriptions.Item label="创建时间">{record.rawData?.create_time || '-'}</Descriptions.Item>
-        <Descriptions.Item label="更新时间">{record.rawData?.update_time || '-'}</Descriptions.Item>
+        <Descriptions.Item label="稽查开始时间">{record.startTime || record.start_time || record.rawData?.start_time || '-'}</Descriptions.Item>
+        <Descriptions.Item label="稽查结束时间">{record.endTime || record.end_time || record.rawData?.end_time || '-'}</Descriptions.Item>
+        <Descriptions.Item label="是否跨天">{getIsCrossDay()}</Descriptions.Item>
+        <Descriptions.Item label="时间差">{record.timeDiff || record.time_diff || record.rawData?.time_diff || '-'}</Descriptions.Item>
+        <Descriptions.Item label="编制人">{record.creator || record.nick_name || '-'}</Descriptions.Item>
+        <Descriptions.Item label="编制日期">{record.createDate || record.create_time || '-'}</Descriptions.Item>
+        <Descriptions.Item label="审核人">{record.reviewer || record.approver_name || '-'}</Descriptions.Item>
+        
+        {/* 添加例外时间段显示 */}
+        <Descriptions.Item label="例外时间段" span={2}>
+          {renderExceptionTimes()}
+        </Descriptions.Item>
       </Descriptions>
     </Modal>
   );

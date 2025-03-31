@@ -6,7 +6,7 @@ const useRuleOperation = (onSuccess, onError) => {
   const userName = useUserName();
   
   // 计算时间差的方法
-  const calculateTimeDiff = (startTime, endTime, isCrossDay) => {
+  const calculateTimeDiff = useCallback((startTime, endTime, isCrossDay) => {
     if (!startTime || !endTime) return '';
     
     // 将时间字符串转换为分钟数
@@ -32,10 +32,10 @@ const useRuleOperation = (onSuccess, onError) => {
     const seconds = Math.round((diffMinutes % 1) * 60);
     
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
+  }, []); // 添加闭合的括号和空依赖数组
 
   // 处理排班数据的通用函数
-  const processScheduleData = (schedule) => {
+  const processScheduleData = useCallback((schedule) => {
     // 创建一个8位的二进制字符串
     let scheduleBinary = '';
     scheduleBinary += '0'; // 最高位为0
@@ -51,7 +51,7 @@ const useRuleOperation = (onSuccess, onError) => {
     const scheduleInt = parseInt(scheduleBinary, 2);
     
     return scheduleInt;
-  };
+  }, []); // 同样使用 useCallback 包装，添加空依赖数组
 
   // 处理规则保存或提交
   const handleRule = useCallback(async (values, isEdit) => {
@@ -72,6 +72,13 @@ const useRuleOperation = (onSuccess, onError) => {
       // 处理排班数据，使用通用函数
       const scheduleInt = processScheduleData(values.schedule || []);
       
+      // 处理例外时间段
+      const exceptionTimes = values.exceptionTimes ? values.exceptionTimes.map(item => ({
+        start: item.startTime ? item.startTime.format('YYYY-MM-DD HH:mm:ss') : '',
+        end: item.endTime ? item.endTime.format('YYYY-MM-DD HH:mm:ss') : '',
+        explain: item.description || '' // 将 description 映射到 explain 字段
+      })) : [];
+      
       // 构建请求数据
       const requestData = {
         remark: values.description,
@@ -88,6 +95,7 @@ const useRuleOperation = (onSuccess, onError) => {
         time_diff: timeDiff,
         assessment_level: assessmentLevel, // 添加职级字段
         work_schedule: scheduleInt, // 使用整数类型
+        exception_time: exceptionTimes, // 添加例外时间字段
       };
       
       // 如果是编辑模式，添加rule_id字段
@@ -125,7 +133,7 @@ const useRuleOperation = (onSuccess, onError) => {
       if (onError) onError(error);
       return { success: false, error };
     }
-  }, [onSuccess, onError, userName]); // 添加 userName 作为依赖项
+  }, [onSuccess, onError, userName, calculateTimeDiff, processScheduleData]); // 添加缺失的依赖项
 
   // 为了保持向后兼容，保留原来的函数名称
   const createRule = useCallback((values) => {
@@ -173,6 +181,13 @@ const useRuleOperation = (onSuccess, onError) => {
         scheduleInt = 31;
       }
       
+      // 处理例外时间段
+      const exceptionTimes = values.exceptionTimes ? values.exceptionTimes.map(item => ({
+        start: item.startTime ? item.startTime.format('YYYY-MM-DD HH:mm:ss') : '',
+        end: item.endTime ? item.endTime.format('YYYY-MM-DD HH:mm:ss') : '',
+        explain: item.description || '' // 将 description 映射到 explain 字段
+      })) : [];
+      
       // 构建请求数据
       const requestData = {
         remark: values.description,
@@ -189,6 +204,7 @@ const useRuleOperation = (onSuccess, onError) => {
         time_diff: timeDiff,
         assessment_level: assessmentLevel,
         work_schedule: scheduleInt,
+        exception_time: exceptionTimes, // 使用正确的字段名 exception_time
       };
       
       // 如果是编辑模式，添加rule_id字段
@@ -221,7 +237,7 @@ const useRuleOperation = (onSuccess, onError) => {
       if (onError) onError(error);
       return { success: false, error };
     }
-  }, [onSuccess, onError, userName]); // 添加 userName 作为依赖项
+  }, [calculateTimeDiff, onSuccess, onError, userName, processScheduleData]); // 添加 userName 作为依赖项
 
   // 撤回规则
   const withdrawRule = useCallback(async (record) => {

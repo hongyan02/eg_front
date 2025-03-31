@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, TimePicker, Button, Checkbox, Row, Col, Select } from 'antd';
+import { Modal, Form, Input, TimePicker, Button, Checkbox, Row, Col, Select, Divider } from 'antd';
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
@@ -32,16 +32,66 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
   // 当编辑记录变化时，重置表单数据
   useEffect(() => {
     if (visible && isEdit && editRecord) {
-      // 处理时间格式，将字符串转换为moment对象
-      const startTime = editRecord.startTime ? moment(editRecord.startTime, 'HH:mm:ss') : null;
-      const endTime = editRecord.endTime ? moment(editRecord.endTime, 'HH:mm:ss') : null;
+      console.log('编辑记录原始数据:', editRecord);
       
-      // 处理例外时间段数据，如果有的话
-      const exceptionTimes = editRecord.exceptionTimes || [];
-      const formattedExceptionTimes = exceptionTimes.map(item => ({
-        startTime: item.startTime ? moment(item.startTime, 'HH:mm:ss') : null,
-        endTime: item.endTime ? moment(item.endTime, 'HH:mm:ss') : null
-      }));
+      // 处理时间格式，将字符串转换为moment对象
+      let startTime = editRecord.startTime ? moment(editRecord.startTime, 'HH:mm:ss') : null;
+      let endTime = editRecord.endTime ? moment(editRecord.endTime, 'HH:mm:ss') : null;
+      
+      // 如果直接的时间字段为空，尝试从rawData中获取
+      if (!startTime && editRecord.rawData?.start_time) {
+        startTime = moment(editRecord.rawData.start_time, 'HH:mm:ss');
+        console.log('从rawData获取开始时间:', editRecord.rawData.start_time, '转换后:', startTime);
+      } else if (!startTime && editRecord.start_time) {
+        // 直接从编辑记录中获取start_time字段
+        startTime = moment(editRecord.start_time, 'HH:mm:ss');
+        console.log('直接从编辑记录获取开始时间:', editRecord.start_time, '转换后:', startTime);
+      }
+      
+      if (!endTime && editRecord.rawData?.end_time) {
+        endTime = moment(editRecord.rawData.end_time, 'HH:mm:ss');
+        console.log('从rawData获取结束时间:', editRecord.rawData.end_time, '转换后:', endTime);
+      } else if (!endTime && editRecord.end_time) {
+        // 直接从编辑记录中获取end_time字段
+        endTime = moment(editRecord.end_time, 'HH:mm:ss');
+        console.log('直接从编辑记录获取结束时间:', editRecord.end_time, '转换后:', endTime);
+      }
+      
+      // 打印完整的编辑记录，查看所有可能的字段名
+      console.log('编辑记录字段:', {
+        directFields: Object.keys(editRecord),
+        rawDataFields: editRecord.rawData ? Object.keys(editRecord.rawData) : [],
+        startTime: startTime,
+        endTime: endTime
+      });
+      
+      // 处理例外时间段数据
+      let formattedExceptionTimes = [];
+      
+      // 检查 rawData 中是否有 exception_time 字段
+      if (editRecord.rawData && editRecord.rawData.exception_time && Array.isArray(editRecord.rawData.exception_time)) {
+        formattedExceptionTimes = editRecord.rawData.exception_time.map(item => ({
+          startTime: item.start ? moment(item.start) : null,
+          endTime: item.end ? moment(item.end) : null,
+          description: item.explain || '' // 从 explain 字段映射到 description
+        }));
+      } 
+      // 如果没有在 rawData 中找到，则尝试在 exceptionTimes 中查找
+      else if (editRecord.exceptionTimes && Array.isArray(editRecord.exceptionTimes)) {
+        formattedExceptionTimes = editRecord.exceptionTimes.map(item => ({
+          startTime: item.startTime ? moment(item.startTime) : null,
+          endTime: item.endTime ? moment(item.endTime) : null,
+          description: item.description || item.explain || '' // 支持两种字段名
+        }));
+      }
+      // 直接从编辑记录中获取exception_time字段
+      else if (editRecord.exception_time && Array.isArray(editRecord.exception_time)) {
+        formattedExceptionTimes = editRecord.exception_time.map(item => ({
+          startTime: item.start ? moment(item.start) : null,
+          endTime: item.end ? moment(item.end) : null,
+          description: item.explain || '' // 从 explain 字段映射到 description
+        }));
+      }
       
       // 处理职级数据，如果有的话
       const assessmentLevel = editRecord.rawData?.assessment_level ? 
@@ -62,11 +112,69 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
       if (scheduleBinary.charAt(2) === '1') schedule.push('sat');
       if (scheduleBinary.charAt(1) === '1') schedule.push('sun');
       
+      // 确定是否跨天
+      let isCrossDay = false;
+      
+      // 根据开始时间和时间差计算是否跨天（优先使用这种方式）
+      if (editRecord.rawData?.start_time && editRecord.rawData?.time_diff) {
+        // 直接从字符串提取小时数
+        const startHour = parseInt(editRecord.rawData.start_time.split(':')[0]);
+        const diffHour = parseInt(editRecord.rawData.time_diff.split(':')[0]);
+        
+        // 简单判断：如果开始时间加上时间差的小时数大于等于24，则为跨天
+        isCrossDay = (startHour + diffHour) >= 24;
+        
+        console.log('跨天计算详情:', {
+          startHour,
+          diffHour,
+          sum: startHour + diffHour,
+          isCrossDay
+        });
+      }
+      // 然后检查原始数据中的 is_cross_day 字段
+      else if (editRecord.rawData?.is_cross_day !== undefined) {
+        isCrossDay = editRecord.rawData.is_cross_day === 1;
+      }
+      // 根据开始时间和结束时间计算是否跨天
+      else if (editRecord.rawData?.start_time && editRecord.rawData?.end_time) {
+        const [startHours, startMinutes] = editRecord.rawData.start_time.split(':').map(Number);
+        const [endHours, endMinutes] = editRecord.rawData.end_time.split(':').map(Number);
+        
+        const startTotalMinutes = startHours * 60 + startMinutes;
+        const endTotalMinutes = endHours * 60 + endMinutes;
+        
+        // 如果结束时间小于开始时间，则认为是跨天
+        isCrossDay = endTotalMinutes < startTotalMinutes;
+      }
+      // 最后根据开始时间和结束时间计算是否跨天
+      else if (startTime && endTime) {
+        const startMinutes = startTime.hours() * 60 + startTime.minutes();
+        const endMinutes = endTime.hours() * 60 + endTime.minutes();
+        
+        // 如果结束时间小于开始时间，则认为是跨天
+        isCrossDay = endMinutes < startMinutes;
+      }
+      // 使用记录中的 isCrossDay 字段（最低优先级）
+      else if (editRecord.isCrossDay !== undefined) {
+        isCrossDay = editRecord.isCrossDay;
+      }
+      
+      console.log('跨天判断:', {
+        startTime: editRecord.rawData?.start_time,
+        endTime: editRecord.rawData?.end_time,
+        timeDiff: editRecord.rawData?.time_diff,
+        isCrossDay,
+        calculation: editRecord.rawData?.start_time && editRecord.rawData?.time_diff ? 
+          `${editRecord.rawData.start_time.split(':')[0]} + ${editRecord.rawData.time_diff.split(':')[0]} = ${
+            Number(editRecord.rawData.start_time.split(':')[0]) + Number(editRecord.rawData.time_diff.split(':')[0])
+          }` : ''
+      });
+      
       form.setFieldsValue({
         ...editRecord,
         startTime,
         endTime,
-        isCrossDay: editRecord.isCrossDay || false,
+        isCrossDay: isCrossDay,
         doorName: editRecord.doorName || '',
         approverId: editRecord.approverId || '',
         exceptionTimes: formattedExceptionTimes.length > 0 ? formattedExceptionTimes : undefined,
@@ -247,35 +355,49 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
           </Col>
         </Row>
         
-        {/* 添加例外时间段 */}
+        {/* 例外时间段 */}
+        <Divider orientation="left">例外时间段</Divider>
         <Form.List name="exceptionTimes">
           {(fields, { add, remove }) => (
             <>
-              <div className="mb-2 font-medium">例外时间段</div>
               {fields.map(({ key, name, ...restField }) => (
-                <Row key={key} gutter={16} align="middle" className="mb-2">
-                  <Col span={10}>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'startTime']}
-                      rules={[{ required: false, message: '请选择开始时间' }]}
-                    >
-                      <TimePicker format="HH:mm:ss" placeholder="开始时间" style={{ width: '100%' }} />
-                    </Form.Item>
-                  </Col>
-                  <Col span={10}>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'endTime']}
-                      rules={[{ required: false, message: '请选择结束时间' }]}
-                    >
-                      <TimePicker format="HH:mm:ss" placeholder="结束时间" style={{ width: '100%' }} />
-                    </Form.Item>
-                  </Col>
-                  <Col span={4} style={{ display: 'flex', justifyContent: 'center' }}>
-                    <MinusCircleOutlined onClick={() => remove(name)} style={{ color: '#ff4d4f' }} />
-                  </Col>
-                </Row>
+                <div key={key} className="mb-4 p-3 border border-gray-200 rounded-md">
+                  <Row gutter={16}>
+                    <Col span={11}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'startTime']}
+                        label="开始时间"
+                        rules={[{ required: true, message: '请选择开始时间' }]}
+                      >
+                        <TimePicker format="HH:mm:ss" style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                    <Col span={11}>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'endTime']}
+                        label="结束时间"
+                        rules={[{ required: true, message: '请选择结束时间' }]}
+                      >
+                        <TimePicker format="HH:mm:ss" style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                    <Col span={2} className="flex items-center justify-end mt-8">
+                      <MinusCircleOutlined onClick={() => remove(name)} className="text-red-500" />
+                    </Col>
+                  </Row>
+                  
+                  {/* 添加例外时间说明字段 */}
+                  <Form.Item
+                    {...restField}
+                    name={[name, 'description']}
+                    label="例外时间说明"
+                    rules={[{ required: true, message: '请输入例外时间说明' }]}
+                  >
+                    <Input placeholder="请输入此例外时间段的说明" />
+                  </Form.Item>
+                </div>
               ))}
               <Form.Item>
                 <Button 

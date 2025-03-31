@@ -3,6 +3,7 @@ import useDoorSearch from './useDoorSearch';
 import useEditDoor from './useEditDoor';
 import useDeleteDoor from './useDeleteDoor';
 import useAddDoor from './useAddDoor';
+import useStatusToggle from './useStatusToggle'; // 引入状态切换 hook
 import { useEffect, useState } from 'react';
 
 function useDoorAccess() {
@@ -114,9 +115,12 @@ function useDoorAccess() {
     await handleDelete(key);
   };
 
+  // 使用状态切换 hook
+  const { statusLoading, handleStatusToggle } = useStatusToggle(fetchDoorData);
+  
   return {
     doorData: hasSearched ? filteredData : doorData,
-    loading,
+    loading: loading || deleteLoading || statusLoading, // 添加状态加载状态
     currentPage,
     form,
     editModalVisible,
@@ -133,7 +137,8 @@ function useDoorAccess() {
     handleEditCancel,
     handleEditSubmit: wrappedHandleEditSubmit,
     handleDelete: wrappedHandleDelete,
-    handlePageChange
+    handlePageChange,
+    handleStatusToggle // 添加状态切换处理函数
   };
 }
 
