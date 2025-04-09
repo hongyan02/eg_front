@@ -53,25 +53,28 @@ const useAbnormalData = (searchParams = {}) => {
           employeeId: item.username,
           name: item.nickname,
           department: item.dept_name || item.deptname || '未知部门',
-          // 使用 formatDateTime 格式化异常时间
           abnormalTime: formatDateTime(item.exception_time),
-          exitTime: formatDateTime(item.datetime), // 仅用于显示
+          // 修改为使用 out_door_time 作为出场时间
+          exitTime: formatDateTime(item.out_door_time) || formatDateTime(item.datetime),
           exitAccessName: item.outdoor_name,
-          entryTime: formatDateTime(item.datetime), // 仅用于显示
+          // 修改为使用 in_door_time 作为入场时间
+          entryTime: formatDateTime(item.in_door_time) || formatDateTime(item.datetime),
           entryAccessId: item.door_code,
           abnormalRuleId: item.rule_id,
           departmentManager: item.leader,
           confirmed: item.is_confirm === "1",
           reason: item.reason || "",
           submitted: item.is_submit === "1",
-          abnormalDate: formatDate(item.datetime), // 仅用于显示
+          abnormalDate: formatDate(item.datetime),
           doorArea: item.door_area,
           doorType: item.door_type,
           leaderId: item.leader_id,
           // 保存原始时间格式用于API提交
           originalDatetime: item.datetime,
-          // 保存原始异常时间格式用于API提交
-          originalExceptionTime: item.exception_time
+          originalExceptionTime: item.exception_time,
+          // 保存原始进出时间
+          originalInDoorTime: item.in_door_time,
+          originalOutDoorTime: item.out_door_time
         }));
         
         setData(formattedData);

@@ -30,6 +30,9 @@ const RuleDetailModal = ({ visible, onCancel, record }) => {
 
   const getDoorName = () => {
     const doorName = record.rawData?.door_name;
+    if (Array.isArray(doorName)) {
+      return doorName.join('、');
+    }
     if (typeof doorName === 'object' && doorName !== null) {
       return doorName.name || JSON.stringify(doorName);
     }
@@ -41,10 +44,11 @@ const RuleDetailModal = ({ visible, onCancel, record }) => {
     if (!record.rawData?.assessment_level) return '-';
     
     const levelMap = {
-      '10': '职员',
-      '9': '主管',
-      '8': '经理',
-      '5': '高级经理'
+      '4': '职员',
+      '14': '主管',
+      '12': '经理',
+      '9': '高级经理',
+      '0': '员工',
     };
     
     return record.rawData.assessment_level.split(',')
@@ -60,13 +64,13 @@ const RuleDetailModal = ({ visible, onCancel, record }) => {
     const scheduleBinary = scheduleInt.toString(2).padStart(8, '0');
     
     const dayMap = {
-      7: '周一',
-      6: '周二',
-      5: '周三',
+      1: '周一',
+      2: '周二',
+      3: '周三',
       4: '周四',
-      3: '周五',
-      2: '周六',
-      1: '周日'
+      5: '周五',
+      6: '周六',
+      7: '周日'
     };
     
     const days = [];

@@ -79,19 +79,19 @@ const AbnormalTable = ({ searchParams }) => {
       title: '异常日期',
       dataIndex: 'abnormalDate',
       key: 'abnormalDate',
-      width: 100,
+      width: 120,
     },
     {
       title: '工号',
       dataIndex: 'employeeId',
       key: 'employeeId',
-      width: 80,
+      width: 90,
     },
     {
       title: '姓名',
       dataIndex: 'name',
       key: 'name',
-      width: 80,
+      width: 90,
     },
     {
       title: '部门',
@@ -103,13 +103,13 @@ const AbnormalTable = ({ searchParams }) => {
       title: '异常时间',
       dataIndex: 'abnormalTime',
       key: 'abnormalTime',
-      width: 100,
+      width: 110,
     },
     {
       title: '出场时间',
       dataIndex: 'exitTime',
       key: 'exitTime',
-      width: 100,
+      width: 110,
     },
     {
       title: '出场门禁名称',
@@ -129,7 +129,7 @@ const AbnormalTable = ({ searchParams }) => {
       title: '入场时间',
       dataIndex: 'entryTime',
       key: 'entryTime',
-      width: 100,
+      width: 110,
     },
     {
       title: '入场门禁编号',
@@ -141,7 +141,7 @@ const AbnormalTable = ({ searchParams }) => {
       title: '异常规则编号',
       dataIndex: 'abnormalRuleId',
       key: 'abnormalRuleId',
-      width: 120,
+      width: 150,
     },
     {
       title: '部门负责人',

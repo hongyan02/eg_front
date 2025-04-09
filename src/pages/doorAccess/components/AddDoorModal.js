@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, Select, Row, Col, Button } from 'antd';
+import useEntryCodeList from '../hooks/useEntryCodeList';
 
 const { Option } = Select;
 
 const AddDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, areaOptions, typeOptions }) => {
   const [form] = Form.useForm();
+  const { entryCodeList, loading: entryCodeLoading } = useEntryCodeList();
 
   useEffect(() => {
     if (visible) {
@@ -59,9 +61,25 @@ const AddDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, areaOptions
             <Form.Item
               name="door_code"
               label="门禁编号"
-              rules={[{ required: true, message: '请输入门禁编号' }]}
+              rules={[{ required: true, message: '请选择门禁编号' }]}
             >
-              <Input placeholder="请输入门禁编号" />
+              <Select
+                placeholder="请选择门禁编号"
+                loading={entryCodeLoading}
+                showSearch
+                optionFilterProp="label"
+                popupMatchSelectWidth={false}
+              >
+                {entryCodeList.map(option => (
+                  <Option 
+                    key={option.value} 
+                    value={option.value}
+                    label={option.label}
+                  >
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -82,16 +100,12 @@ const AddDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, areaOptions
               label="门禁区域"
               rules={[{ required: true, message: '请选择门禁区域' }]}
             >
-              <Select placeholder="请选择门禁区域">
-                {areaOptions && areaOptions.length > 0 ? (
-                  areaOptions.map(option => (
-                    <Option key={option.value} value={option.value}>
-                      {option.text}
-                    </Option>
-                  ))
-                ) : (
-                  <Option value="新区域">新区域</Option>
-                )}
+              <Select 
+                placeholder="请选择门禁区域"
+                popupMatchSelectWidth={false}
+              >
+                <Option value="三区">三区</Option>
+                <Option value="十区">十区</Option>
               </Select>
             </Form.Item>
           </Col>

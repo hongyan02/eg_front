@@ -90,12 +90,13 @@ const useRuleOperation = (onSuccess, onError) => {
         user_name: userName, // 使用 Hook 获取的工号
         nick_name: userName, // 使用 Hook 获取的工号
         approver_name: values.reviewer || '',
-        approver_id: '128578',
+        // approver_id: userName,
         is_cross_day: values.isCrossDay ? 1 : 0,
         time_diff: timeDiff,
         assessment_level: assessmentLevel, // 添加职级字段
         work_schedule: scheduleInt, // 使用整数类型
         exception_time: exceptionTimes, // 添加例外时间字段
+        time:values.time || 30,
       };
       
       // 如果是编辑模式，添加rule_id字段
@@ -165,7 +166,7 @@ const useRuleOperation = (onSuccess, onError) => {
       } else if (values.rawData && values.rawData.assessment_level) {
         assessmentLevel = values.rawData.assessment_level;
       } else {
-        assessmentLevel = '10'; // 默认值
+        assessmentLevel = '4'; // 默认值
       }
       
       // 处理排班数据
@@ -192,7 +193,7 @@ const useRuleOperation = (onSuccess, onError) => {
       const requestData = {
         remark: values.description,
         door_area: values.doorArea,
-        door_name: values.doorName, 
+        door_name: values.doorName, // 使用 Hook 获取的工号
         start_time: startTime,
         end_time: endTime,
         status: status,
@@ -205,6 +206,7 @@ const useRuleOperation = (onSuccess, onError) => {
         assessment_level: assessmentLevel,
         work_schedule: scheduleInt,
         exception_time: exceptionTimes, // 使用正确的字段名 exception_time
+        time: values.time || 30, // 添加稽查时间标准字段
       };
       
       // 如果是编辑模式，添加rule_id字段

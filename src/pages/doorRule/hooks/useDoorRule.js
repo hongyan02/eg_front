@@ -56,17 +56,21 @@ const useDoorRule = () => {
       const result = await response.json();
       
       if (Array.isArray(result)) {
-        // 处理API返回的数据格式，转换为组件需要的格式
-        const processedData = result.map(item => ({
-          ruleNumber: item.rule_id,
-          creator: item.nick_name,
-          reviewer: item.approver_name,
-          description: item.remark,
-          approvalDate: item.update_time ? new Date(item.update_time).toLocaleDateString() : '',
-          status: mapStatusCode(item.status),
-          // 保留原始数据，以便在编辑时使用
-          rawData: item
-        }));
+        const processedData = result.map(item => {
+          return {
+            ruleNumber: item.rule_id,
+            creator: item.nick_name,
+            reviewer: item.approver_name,
+            description: item.remark,
+            approvalDate: item.update_time ? new Date(item.update_time).toLocaleDateString() : '',
+            status: mapStatusCode(item.status),
+            doorName: Array.isArray(item.door_name) ? item.door_name.join(', ') : item.door_name,
+            rawData: {
+              ...item,
+              door_name: item.door_name // 保持原始数据格式不变
+            }
+          };
+        });
         
         setRuleData(processedData);
       } else {
@@ -170,34 +174,24 @@ const useDoorRule = () => {
   
   // 处理编辑规则
   const handleEdit = useCallback((record) => {
-    // 从原始数据中提取需要编辑的字段
     const doorArea = record.rawData.door_area;
-    const doorName = record.rawData.door_name;
-    
-    // 处理门禁区域和门禁名称，如果是对象则提取值
-    const processedDoorArea = typeof doorArea === 'object' && doorArea !== null 
-      ? (doorArea.area || JSON.stringify(doorArea)) 
-      : doorArea;
-    
-    const processedDoorName = typeof doorName === 'object' && doorName !== null 
-      ? (doorName.name || JSON.stringify(doorName)) 
-      : doorName;
     
     const editData = {
       ruleNumber: record.ruleNumber,
       description: record.description,
-      doorArea: processedDoorArea,
-      doorName: processedDoorName,
+      doorArea: typeof doorArea === 'object' && doorArea !== null 
+        ? (doorArea.area || JSON.stringify(doorArea)) 
+        : doorArea,
+      doorName: record.rawData.door_name, // 保持原始数据格式
       startTime: record.rawData.start_time,
       endTime: record.rawData.end_time,
       isCrossDay: record.rawData.is_cross_day === 1,
       creator: record.creator,
       reviewer: record.reviewer,
       approverId: record.rawData.approver_id,
-      rawData: record.rawData // 传递原始数据，以便在表单中获取职级信息
+      rawData: record.rawData // 保持完整的原始数据
     };
     
-    console.log('编辑数据:', editData);
     setEditRecord(editData);
     setEditModalVisible(true);
   }, []);
@@ -341,7 +335,7 @@ const useDoorRule = () => {
     auditLoading,
     detailModalVisible,
     detailRecord,
-    userName, // 返回工号，以便在组件中使用
+    userName, 
     handleMyAudit,
     handleApprove,
     handleReject,

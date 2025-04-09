@@ -1,14 +1,22 @@
 import { useState, useCallback } from 'react';
 import { message } from 'antd';
+import useUserName from '../../../utils/cookie/useUserName';
 
 const useAudit = (onAuditSuccess) => {
-  // 审核模态框状态
   const [auditModalVisible, setAuditModalVisible] = useState(false);
   const [auditData, setAuditData] = useState([]);
   const [auditLoading, setAuditLoading] = useState(false);
+  
+  // 获取当前用户工号
+  const userName = useUserName();
 
   // 从接口获取审核数据
   const fetchAuditData = useCallback(async () => {
+    if (!userName) {
+      message.error('未获取到用户信息');
+      return;
+    }
+
     setAuditLoading(true);
     try {
       const response = await fetch('http://10.22.161.62:8083/api/rule/pending', {
@@ -16,7 +24,7 @@ const useAudit = (onAuditSuccess) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ user_name: "128578" }),
+        body: JSON.stringify({ user_name: userName }),
       });
       
       if (!response.ok) {
@@ -64,7 +72,7 @@ const useAudit = (onAuditSuccess) => {
       message.error('获取审核数据失败: ' + (error.message || '未知错误'));
       setAuditLoading(false);
     }
-  }, []);
+  }, [userName]); // 添加 userName 到依赖数组
 
   // 处理我的审核
   const handleMyAudit = useCallback(() => {
@@ -75,6 +83,11 @@ const useAudit = (onAuditSuccess) => {
 
   // 处理审核同意
   const handleApprove = useCallback(async (record) => {
+    if (!userName) {
+      message.error('未获取到用户信息');
+      return;
+    }
+
     console.log('同意规则:', record);
     setAuditLoading(true);
     
@@ -86,7 +99,7 @@ const useAudit = (onAuditSuccess) => {
         },
         body: JSON.stringify({ 
           rule_id: record.ruleNumber,
-          user_name: "128578",
+          user_name: userName,
           status: "2" // 同意状态为2
         }),
       });
@@ -124,10 +137,15 @@ const useAudit = (onAuditSuccess) => {
       }
       setAuditLoading(false);
     }
-  }, [fetchAuditData, onAuditSuccess]);
+  }, [fetchAuditData, onAuditSuccess, userName]); // 添加 userName 到依赖数组
 
   // 处理审核驳回 - 同样修改
   const handleReject = useCallback(async (record) => {
+    if (!userName) {
+      message.error('未获取到用户信息');
+      return;
+    }
+
     console.log('驳回规则:', record);
     setAuditLoading(true);
     
@@ -139,7 +157,7 @@ const useAudit = (onAuditSuccess) => {
         },
         body: JSON.stringify({ 
           rule_id: record.ruleNumber,
-          user_name: "128578",
+          user_name: userName,
           status: "0" // 驳回状态为0
         }),
       });
@@ -177,7 +195,7 @@ const useAudit = (onAuditSuccess) => {
       }
       setAuditLoading(false);
     }
-  }, [fetchAuditData, onAuditSuccess]);
+  }, [fetchAuditData, onAuditSuccess, userName]); // 添加 userName 到依赖数组
 
   // 处理审核模态框取消
   const handleAuditModalCancel = useCallback(() => {

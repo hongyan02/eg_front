@@ -44,9 +44,11 @@ const useAbnormalData = (searchParams = {}) => {
           department: item.dept_name || item.deptname || '未知部门',
           // 使用 formatDateTime 格式化异常时间
           abnormalTime: formatDateTime(item.exception_time),
-          exitTime: formatDateTime(item.datetime),
+          // 修改为使用 out_door_time 作为出场时间
+          exitTime: formatDateTime(item.out_door_time) || formatDateTime(item.datetime),
           exitAccessName: item.outdoor_name,
-          entryTime: formatDateTime(item.datetime),
+          // 修改为使用 in_door_time 作为入场时间
+          entryTime: formatDateTime(item.in_door_time) || formatDateTime(item.datetime),
           entryAccessId: item.door_code,
           abnormalRuleId: item.rule_id,
           departmentManager: item.leader,
@@ -60,7 +62,10 @@ const useAbnormalData = (searchParams = {}) => {
           // 保存原始时间格式用于API提交
           originalDatetime: item.datetime,
           // 保存原始异常时间格式用于API提交
-          originalExceptionTime: item.exception_time
+          originalExceptionTime: item.exception_time,
+          // 保存原始入场和出场时间
+          originalInDoorTime: item.in_door_time,
+          originalOutDoorTime: item.out_door_time
         }));
         
         setData(formattedData);
