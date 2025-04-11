@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { message } from 'antd';
+import { getUserName } from '../../../utils/cookie/cookieUtils';
 
 function useEditDoor(fetchDoorData) {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const userName = getUserName();
 
   // 处理编辑
   const handleEdit = (record) => {
@@ -23,13 +25,18 @@ function useEditDoor(fetchDoorData) {
     console.log('编辑门禁提交:', values);
     setConfirmLoading(true);
     try {
-      // 这里应该是实际的API调用
+      // 添加用户名到请求体
+      const requestBody = {
+        ...values,
+        user_name: userName || ""
+      };
+      
       const response = await fetch(`http://10.22.161.62:8083/api/entry-list`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(requestBody),
       });
       
       if (response.ok) {

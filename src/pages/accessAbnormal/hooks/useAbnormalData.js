@@ -17,13 +17,14 @@ const useAbnormalData = (searchParams = {}) => {
       const requestBody = {
         data_time_start: searchParams.data_time_start || "",
         data_time_end: searchParams.data_time_end || "",
-        dept_id: searchParams.dept_id || "",  // 这里应该已经是最后一级部门ID
+        dept_id: searchParams.dept_id !== undefined ? Number(searchParams.dept_id) : 0,  // 默认值改为 0
         is_confirm: searchParams.is_confirm || "",
         is_submit: searchParams.is_submit || "",
-        query_user_name: searchParams.username || ""  // 修改参数名为query_user_name
+        query_user_name: searchParams.username || ""
       };
       
-      console.log('请求参数:', requestBody); // 添加日志查看请求参数
+      console.log('发送请求参数:', requestBody); 
+      console.log('部门ID类型:', typeof requestBody.dept_id);
       
       const response = await fetch('http://10.22.161.62:8083/api/get-violations', {
         method: 'POST',
@@ -43,15 +44,15 @@ const useAbnormalData = (searchParams = {}) => {
           name: item.nickname,
           department: item.dept_name || item.deptname || '未知部门',
           // 使用 formatDateTime 格式化异常时间
-          abnormalTime: formatDateTime(item.exception_time),
+          abnormalTime: item.exception_time+'分钟',
           // 修改为使用 out_door_time 作为出场时间
           exitTime: formatDateTime(item.out_door_time) || formatDateTime(item.datetime),
           exitAccessName: item.outdoor_name,
           // 修改为使用 in_door_time 作为入场时间
           entryTime: formatDateTime(item.in_door_time) || formatDateTime(item.datetime),
-          entryAccessId: item.door_code,
+          entryAccessId: item.indoor_name,
           abnormalRuleId: item.rule_id,
-          departmentManager: item.leader,
+          departmentManager: item.leader_id,
           confirmed: item.is_confirm === "1",
           reason: item.reason || "",
           submitted: item.is_submit === "1",

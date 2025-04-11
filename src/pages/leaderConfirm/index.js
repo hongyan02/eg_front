@@ -20,10 +20,7 @@ const LeaderConfirmPage = () => {
       params.username = values.employeeId;
     }
     
-    if (values.department && values.department.length > 0) {
-      const deptId = values.department[values.department.length - 1];
-      params.dept_id = deptId ? deptId.toString() : "";
-    }
+    // 部门搜索相关代码已移除
     
     if (values.confirmed) {
       params.is_confirm = values.confirmed === 'yes' ? '1' : '0';

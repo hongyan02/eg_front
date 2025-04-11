@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { message } from 'antd';
+import { getUserName } from '../../../utils/cookie/cookieUtils';
 
 function useDeleteDoor(doorData, setDoorData, fetchDoorData) {
   const [deleteLoading, setDeleteLoading] = useState(false);
-
+  
+  const userName = getUserName();
   // 处理删除
   const handleDelete = async (key) => {
     setDeleteLoading(true);
@@ -20,7 +22,14 @@ function useDeleteDoor(doorData, setDoorData, fetchDoorData) {
       
       // 调用API删除数据
       const response = await fetch(`http://10.22.161.62:8083/api/entry-list/${record.door_code}`, { 
-        method: 'DELETE' 
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          door_code: record.door_code,
+          user_name: userName || ""
+        })
       });
       
       if (response.ok) {

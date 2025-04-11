@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { message } from 'antd';
+import { getUserName } from '../../../utils/cookie/cookieUtils';
 
 function useAddDoor(fetchDoorData) {
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const userName = getUserName();
 
   // 打开新增模态框
   const handleAddDoor = () => {
@@ -20,13 +22,18 @@ function useAddDoor(fetchDoorData) {
     console.log('新增门禁提交:', values);
     setConfirmLoading(true);
     try {
-      // 调用API添加数据
+      // 添加用户名到请求体
+      const requestBody = {
+        ...values,
+        user_name: userName || ""
+      };
+
       const response = await fetch('http://10.22.161.62:8083/api/entry-list', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(requestBody),
       });
       
       if (response.ok) {

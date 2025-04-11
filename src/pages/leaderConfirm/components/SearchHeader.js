@@ -1,13 +1,10 @@
 import React from 'react';
-import { Form, Input, Select, Button, Space, DatePicker, Cascader, Spin, Row, Col } from 'antd';
+import { Form, Input, Select, Button, Space, DatePicker, Row, Col } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
-import useDepartmentCascader from '../hooks/useDepartmentCascader';
 
 const { RangePicker } = DatePicker;
 
 const SearchHeader = ({ form, onSearchFormSubmit }) => {
-  const { departmentOptions, loading } = useDepartmentCascader();
-
   // 处理表单重置
   const handleReset = () => {
     form.resetFields();
@@ -38,7 +35,7 @@ const SearchHeader = ({ form, onSearchFormSubmit }) => {
           </Form.Item>
         </Col>
         
-        <Col xs={24} sm={12} md={6} lg={4} xl={3}>
+        <Col xs={24} sm={12} md={6} lg={4} xl={4}>
           <Form.Item 
             name="employeeId" 
             label="工号" 
@@ -54,34 +51,9 @@ const SearchHeader = ({ form, onSearchFormSubmit }) => {
           </Form.Item>
         </Col>
         
-        <Col xs={24} sm={12} md={6} lg={4} xl={4}>
-          <Form.Item 
-            name="department" 
-            label="部门" 
-            className="w-full mb-2"
-            labelCol={{ span: 24 }}
-            wrapperCol={{ span: 24 }}
-          >
-            <Spin spinning={loading} size="small">
-              <Cascader 
-                options={departmentOptions}
-                placeholder="请选择部门"
-                className="w-full"
-                expandTrigger="hover"
-                changeOnSelect
-                showSearch={{
-                  filter: (inputValue, path) => {
-                    return path.some(option => 
-                      option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1
-                    );
-                  }
-                }}
-              />
-            </Spin>
-          </Form.Item>
-        </Col>
+        {/* 部门选择器已移除 */}
         
-        <Col xs={24} sm={12} md={6} lg={4} xl={3}>
+        <Col xs={24} sm={12} md={6} lg={4} xl={4}>
           <Form.Item 
             name="confirmed" 
             label="异常确认" 
@@ -100,7 +72,7 @@ const SearchHeader = ({ form, onSearchFormSubmit }) => {
           </Form.Item>
         </Col>
         
-        <Col xs={24} sm={12} md={6} lg={4} xl={3}>
+        <Col xs={24} sm={12} md={6} lg={4} xl={4}>
           <Form.Item 
             name="submitted" 
             label="是否提交" 
@@ -119,7 +91,7 @@ const SearchHeader = ({ form, onSearchFormSubmit }) => {
           </Form.Item>
         </Col>
         
-        <Col xs={24} sm={24} md={12} lg={8} xl={5} className="flex items-end justify-end">
+        <Col xs={24} sm={24} md={12} lg={8} xl={6} className="flex items-end justify-end">
           <Form.Item className="mb-2">
             <Space>
               <Button 

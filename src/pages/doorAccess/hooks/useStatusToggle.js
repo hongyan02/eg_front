@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { message } from 'antd';
+import { getUserName } from '../../../utils/cookie/cookieUtils';
 
 function useStatusToggle(fetchDoorData) {
   const [statusLoading, setStatusLoading] = useState(false);
-
+  const userName = getUserName();
   // 处理状态切换
   const handleStatusToggle = async (record, checked) => {
     setStatusLoading(true);
@@ -11,7 +12,8 @@ function useStatusToggle(fetchDoorData) {
       // 构建请求数据
       const requestData = {
         id: record.id,
-        status: checked ? '0' : '1' // 切换状态：true -> 启用(0)，false -> 禁用(1)
+        status: checked ? '0' : '1' ,// 切换状态：true -> 启用(0)，false -> 禁用(1)
+        user_name: userName,
       };
       
       console.log('切换门禁状态:', requestData);

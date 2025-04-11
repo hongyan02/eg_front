@@ -19,7 +19,7 @@ const useRuleOperation = (onSuccess, onError) => {
     let endMinutes = getMinutes(endTime);
     
     // 处理跨天情况
-    if (isCrossDay && endMinutes < startMinutes) {
+    if (isCrossDay && endMinutes <= startMinutes) {
       endMinutes += 24 * 60; // 加上一天的分钟数
     }
     

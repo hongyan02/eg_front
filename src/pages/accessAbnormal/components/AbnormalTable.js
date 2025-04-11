@@ -1,15 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Tag, Tooltip, message, Button } from 'antd';
 import { CheckCircleOutlined, QuestionCircleOutlined, DownloadOutlined } from '@ant-design/icons';
 import useAbnormalData from '../hooks/useAbnormalData';
 
 const AbnormalTable = ({ searchParams }) => {
   const { data, loading, error, total } = useAbnormalData(searchParams);
+  const [tableData, setTableData] = useState([]);
+  const [tableTotal, setTableTotal] = useState(0);
+  
+  // 当 data 和 total 变化时更新表格数据和总数
+  useEffect(() => {
+    // 确保 data 是数组且有内容，否则设置为空数组
+    setTableData(Array.isArray(data) && data.length > 0 ? data : []);
+    // 同时更新总数
+    setTableTotal(Array.isArray(data) && data.length > 0 ? total : 0);
+  }, [data, total]);
   
   // 显示错误信息
   React.useEffect(() => {
     if (error) {
       message.error(error);
+      // 出错时清空表格数据和总数
+      setTableData([]);
+      setTableTotal(0);
     }
   }, [error]);
 
@@ -116,14 +129,14 @@ const AbnormalTable = ({ searchParams }) => {
       dataIndex: 'exitAccessName',
       key: 'exitAccessName',
       width: 120,
-      ellipsis: {
-        showTitle: false,
-      },
-      render: (text) => (
-        <Tooltip placement="topLeft" title={text}>
-          {text}
-        </Tooltip>
-      ),
+      // ellipsis: {
+      //   showTitle: false,
+      // },
+      // render: (text) => (
+      //   <Tooltip placement="topLeft" title={text}>
+      //     {text}
+      //   </Tooltip>
+      // ),
     },
     {
       title: '入场时间',
@@ -202,7 +215,7 @@ const AbnormalTable = ({ searchParams }) => {
       </div>
       <Table 
         columns={columns} 
-        dataSource={data} 
+        dataSource={tableData}
         rowKey="id"
         loading={loading}
         scroll={{ x: 1500 }}
@@ -211,7 +224,7 @@ const AbnormalTable = ({ searchParams }) => {
           showQuickJumper: true,
           showTotal: (total) => `共 ${total} 条记录`,
           defaultPageSize: 10,
-          total: total,
+          total: tableTotal, // 使用本地状态的 tableTotal
         }}
       />
     </div>

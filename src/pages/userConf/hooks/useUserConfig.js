@@ -1,6 +1,7 @@
 import { Form, message } from 'antd';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import useDepartmentTree from './useDepartmentTree';
+import { getUserName } from '../../../utils/cookie/cookieUtils';
 
 const useUserConfig = () => {
   const [form] = Form.useForm();
@@ -8,6 +9,9 @@ const useUserConfig = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [searchValues, setSearchValues] = useState(null);
   const [loading, setLoading] = useState(false); // 添加loading状态
+  
+  // 直接从 cookie 获取用户名
+  const userName = getUserName();
   
   // 使用分离出来的部门树 hook
   const {
@@ -21,7 +25,7 @@ const useUserConfig = () => {
   } = useDepartmentTree();
 
   // 获取用户稽查状态
-  const fetchUserInspectionStatus = async (userId) => {
+  const fetchUserInspectionStatus = useCallback(async (userId) => {
     try {
       const response = await fetch('http://10.22.161.62:8083/api/inspection/user', {
         method: 'POST',
@@ -29,7 +33,8 @@ const useUserConfig = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_name: userId
+          user_name: userId,
+          login_name: userName
         }),
       });
       
@@ -46,7 +51,7 @@ const useUserConfig = () => {
       console.error('获取用户稽查状态出错:', error);
       return false;
     }
-  };
+  }, [userName]);
 
   // 当部门员工数据更新时，获取每个员工的稽查状态
   useEffect(() => {
@@ -101,7 +106,7 @@ const useUserConfig = () => {
     };
 
     updateEmployeesStatus();
-  }, [departmentEmployees]);
+  }, [departmentEmployees, fetchUserInspectionStatus]);
 
   // 当员工数据或搜索条件变化时，应用搜索过滤
   useEffect(() => {
@@ -162,7 +167,8 @@ const useUserConfig = () => {
         },
         body: JSON.stringify({
           user_name: employee.employeeId,
-          is_inspection: newChecked ? "0" : "1" // 0为打开，1为关闭
+          is_inspection: newChecked ? "0" : "1", // 0为打开，1为关闭
+          login_name: userName || "" // 添加 login_name 参数
         }),
       });
       

@@ -69,12 +69,18 @@ const SearchHeader = ({ form, onSearchFormSubmit }) => {
                 className="w-full"
                 expandTrigger="hover"
                 changeOnSelect
+                fieldNames={{ label: 'label', value: 'value', children: 'children' }}
                 showSearch={{
                   filter: (inputValue, path) => {
                     return path.some(option => 
                       option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1
                     );
                   }
+                }}
+                onChange={(value, selectedOptions) => {
+                  console.log('部门选择变化:', value, selectedOptions);
+                  // 确保值能正确保存到表单中
+                  form.setFieldsValue({ department: value });
                 }}
               />
             </Spin>

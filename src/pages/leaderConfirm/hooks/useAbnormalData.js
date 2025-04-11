@@ -53,13 +53,13 @@ const useAbnormalData = (searchParams = {}) => {
           employeeId: item.username,
           name: item.nickname,
           department: item.dept_name || item.deptname || '未知部门',
-          abnormalTime: formatDateTime(item.exception_time),
+          abnormalTime: item.exception_time+'分钟',
           // 修改为使用 out_door_time 作为出场时间
           exitTime: formatDateTime(item.out_door_time) || formatDateTime(item.datetime),
           exitAccessName: item.outdoor_name,
           // 修改为使用 in_door_time 作为入场时间
           entryTime: formatDateTime(item.in_door_time) || formatDateTime(item.datetime),
-          entryAccessId: item.door_code,
+          entryAccessId: item.indoor_name,
           abnormalRuleId: item.rule_id,
           departmentManager: item.leader,
           confirmed: item.is_confirm === "1",

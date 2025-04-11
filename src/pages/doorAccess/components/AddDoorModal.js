@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, Select, Row, Col, Button } from 'antd';
 import useEntryCodeList from '../hooks/useEntryCodeList';
+import { getUserName } from '../../../utils/cookie/cookieUtils';
 
 const { Option } = Select;
 
 const AddDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, areaOptions, typeOptions }) => {
   const [form] = Form.useForm();
   const { entryCodeList, loading: entryCodeLoading } = useEntryCodeList();
+  const userName = getUserName();
 
   useEffect(() => {
     if (visible) {
@@ -17,7 +19,11 @@ const AddDoorModal = ({ visible, onCancel, onSubmit, confirmLoading, areaOptions
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      onSubmit(values);
+      // 添加用户名到表单值中
+      onSubmit({
+        ...values,
+        user_name: userName,
+      });
     } catch (error) {
       console.error('表单验证失败:', error);
     }

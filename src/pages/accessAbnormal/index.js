@@ -20,10 +20,12 @@ const AccessAbnormalPage = () => {
       params.username = values.employeeId;
     }
     
-    if (values.department && values.department.length > 0) {
-      // 获取最后一级部门ID
-      const deptId = values.department[values.department.length - 1];
-      params.dept_id = deptId ? deptId.toString() : "";
+    if (values.department && Array.isArray(values.department) && values.department.length > 0) {
+      // 只获取数组中的最后一个元素（最后一级部门ID）
+      const lastDeptId = values.department[values.department.length - 1];
+      // 将部门ID转换为数字类型
+      params.dept_id = Number(lastDeptId);
+      console.log('选择的最后一级部门ID:', params.dept_id, typeof params.dept_id);
     }
     
     if (values.confirmed) {

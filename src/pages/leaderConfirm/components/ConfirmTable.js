@@ -185,14 +185,14 @@ const ConfirmTable = ({ searchParams }) => {
       dataIndex: 'exitAccessName',
       key: 'exitAccessName',
       width: 120,
-      ellipsis: {
-        showTitle: false,
-      },
-      render: (text) => (
-        <Tooltip placement="topLeft" title={text}>
-          {text}
-        </Tooltip>
-      ),
+      // ellipsis: {
+      //   showTitle: false,
+      // },
+      // render: (text) => (
+      //   <Tooltip placement="topLeft" title={text}>
+      //     {text}
+      //   </Tooltip>
+      // ),
     },
     {
       title: '入场时间',

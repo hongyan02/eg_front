@@ -10,7 +10,7 @@ const useDepartmentCascader = () => {
     if (!treeData || !Array.isArray(treeData)) return [];
 
     return treeData.map(node => ({
-      value: node.dept_id,
+      value: Number(node.dept_id), // 确保部门ID是数字类型
       label: node.dept_name,
       children: node.children && node.children.length > 0 
         ? transformTreeData(node.children) 
