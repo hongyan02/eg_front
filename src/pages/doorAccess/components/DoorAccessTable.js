@@ -70,7 +70,7 @@ const DoorAccessTable = ({
       width: 100,
       filters: inOutFilters,
       onFilter: (value, record) => record.in_out_type === value,
-      render: (text) => text === '1' ? '进门' : (text === '0' ? '出门' : '未知'),
+      render: (text) => text === '0' ? '进门' : (text === '1' ? '出门' : '未知'),
     },
     {
       title: 'IP 地址',

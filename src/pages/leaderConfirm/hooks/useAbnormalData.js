@@ -26,7 +26,7 @@ const useAbnormalData = (searchParams = {}) => {
       const requestBody = {
         data_time_start: searchParams.data_time_start || "",
         data_time_end: searchParams.data_time_end || "",
-        dept_id: searchParams.dept_id || "",
+        // dept_id: searchParams.dept_id || "",
         is_confirm: searchParams.is_confirm || "",
         is_submit: searchParams.is_submit || "",
         query_user_name: searchParams.username || "", 

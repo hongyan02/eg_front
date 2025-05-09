@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import useUserName from '../../../utils/cookie/useUserName';
 
 /**
  * 处理异常记录的提交操作
@@ -7,6 +8,7 @@ import { message } from 'antd';
  * @returns {Object} 包含提交操作的方法
  */
 const useViolationActions = (refresh, localReasons = {}) => {
+  const userName = useUserName();
   // 提交异常记录
   const submitViolation = async (record) => {
     try {
@@ -19,9 +21,9 @@ const useViolationActions = (refresh, localReasons = {}) => {
       
       // 构建API请求数据
       const requestData = {
-        id: String(record.id), // 确保 id 是字符串类型
+        id: Number(record.id), // 确保 id 是数字类型
         is_submit: '1', // 设置为已提交
-        user_name: record.employeeId, // 使用当前数据的工号，而不是cookie值
+        user_name: userName, // 使用当前数据的工号，而不是cookie值
         // 使用本地保存的原因或原始原因
         reason: reason
       };

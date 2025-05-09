@@ -106,14 +106,15 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
       // 将数字转换为二进制字符串，然后解析每一位
       const scheduleBinary = parseInt(scheduleInt).toString(2).padStart(8, '0');
       
+      // 二进制位从左到右: 0(最高位), 周日, 周一, 周二, 周三, 周四, 周五, 周六
       const schedule = [];
-      if (scheduleBinary.charAt(7) === '1') schedule.push('mon');
-      if (scheduleBinary.charAt(6) === '1') schedule.push('tue');
-      if (scheduleBinary.charAt(5) === '1') schedule.push('wed');
-      if (scheduleBinary.charAt(4) === '1') schedule.push('thu');
-      if (scheduleBinary.charAt(3) === '1') schedule.push('fri');
-      if (scheduleBinary.charAt(2) === '1') schedule.push('sat');
-      if (scheduleBinary.charAt(1) === '1') schedule.push('sun');
+      if (scheduleBinary.charAt(1) === '1') schedule.push('sun'); // 周日
+      if (scheduleBinary.charAt(2) === '1') schedule.push('mon'); // 周一
+      if (scheduleBinary.charAt(3) === '1') schedule.push('tue'); // 周二
+      if (scheduleBinary.charAt(4) === '1') schedule.push('wed'); // 周三
+      if (scheduleBinary.charAt(5) === '1') schedule.push('thu'); // 周四
+      if (scheduleBinary.charAt(6) === '1') schedule.push('fri'); // 周五
+      if (scheduleBinary.charAt(7) === '1') schedule.push('sat'); // 周六
       
       // 确定是否跨天
       let isCrossDay = false;
@@ -261,7 +262,15 @@ const AddRuleModal = ({ visible, onCancel, onSubmit, confirmLoading, editRecord,
       // 将数字转换为二进制字符串，然后解析每一位
       const scheduleBinary = parseInt(scheduleInt).toString(2).padStart(8, '0');
       
+      // 二进制位从左到右: 0(最高位), 周日, 周一, 周二, 周三, 周四, 周五, 周六
       const schedule = [];
+      if (scheduleBinary.charAt(1) === '1') schedule.push('sun'); // 周日
+      if (scheduleBinary.charAt(2) === '1') schedule.push('mon'); // 周一
+      if (scheduleBinary.charAt(3) === '1') schedule.push('tue'); // 周二
+      if (scheduleBinary.charAt(4) === '1') schedule.push('wed'); // 周三
+      if (scheduleBinary.charAt(5) === '1') schedule.push('thu'); // 周四
+      if (scheduleBinary.charAt(6) === '1') schedule.push('fri'); // 周五
+      if (scheduleBinary.charAt(7) === '1') schedule.push('sat'); // 周六
       if (scheduleBinary.charAt(7) === '1') schedule.push('mon');
       if (scheduleBinary.charAt(6) === '1') schedule.push('tue');
       if (scheduleBinary.charAt(5) === '1') schedule.push('wed');

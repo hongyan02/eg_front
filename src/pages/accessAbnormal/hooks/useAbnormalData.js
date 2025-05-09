@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { formatDateTime, formatDate } from '../../../utils/dateUtils';
+import useUserName from '../../../utils/cookie/useUserName';
 
 const useAbnormalData = (searchParams = {}) => {
   const [loading, setLoading] = useState(false);
@@ -7,6 +8,7 @@ const useAbnormalData = (searchParams = {}) => {
   const [error, setError] = useState(null);
   const [total, setTotal] = useState(0);
 
+  const userName = useUserName();
   // 使用 useCallback 包装 fetchData 函数，确保它只在 searchParams 变化时重新创建
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -20,11 +22,13 @@ const useAbnormalData = (searchParams = {}) => {
         dept_id: searchParams.dept_id !== undefined ? Number(searchParams.dept_id) : 0,  // 默认值改为 0
         is_confirm: searchParams.is_confirm || "",
         is_submit: searchParams.is_submit || "",
-        query_user_name: searchParams.username || ""
+        query_user_name: searchParams.username || "",
+        user_name: userName || "", // 确保即使 userName 为 null 也传入空字符串
       };
       
       console.log('发送请求参数:', requestBody); 
       console.log('部门ID类型:', typeof requestBody.dept_id);
+      console.log('用户名:', userName); // 添加日志检查 userName
       
       const response = await fetch('http://10.22.161.62:8083/api/get-violations', {
         method: 'POST',
@@ -79,7 +83,7 @@ const useAbnormalData = (searchParams = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [searchParams]); // 将 searchParams 作为依赖项
+  }, [searchParams, userName]); 
 
   // 使用 fetchData 作为依赖项
   useEffect(() => {

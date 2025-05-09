@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { message } from 'antd';
+import useUserName from '../../../utils/cookie/useUserName';
 
 /**
  * 处理异常确认和提交操作的自定义Hook
@@ -10,18 +11,16 @@ const useConfirmOperations = (refresh) => {
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const userName = useUserName();
 
   // 处理确认状态变更的函数
   const handleConfirmChange = async (record, value) => {
     try {
       // 构建API请求数据
       const requestData = {
-        id: String(record.id), // 确保 id 是字符串类型
+        id: Number(record.id), // 确保 id 是字符串类型
         is_confirm: value === 'yes' ? '1' : '0',
-        user_name: record.employeeId, // 使用当前数据的工号，而不是cookie值
-        reason: record.reason || '', // 添加原因字段
-        // 如果API需要时间字段，使用原始格式
-        datetime: record.originalDatetime
+        user_name: userName, 
       };
       
       console.log('更新确认状态:', requestData);

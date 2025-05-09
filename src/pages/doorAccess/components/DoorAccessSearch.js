@@ -92,8 +92,8 @@ const DoorAccessSearch = ({ form, onSearch, onReset, doorData = [] }) => {
               className="w-full"
             >
               <Option value="">全部</Option>
-              <Option value="1">进门</Option>
-              <Option value="0">出门</Option>
+              <Option value="0">进门</Option>
+              <Option value="1">出门</Option>
             </Select>
           </Form.Item>
         </Col>

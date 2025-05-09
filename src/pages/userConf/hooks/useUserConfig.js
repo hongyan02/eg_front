@@ -1,7 +1,7 @@
 import { Form, message } from 'antd';
 import { useState, useEffect, useCallback } from 'react';
 import useDepartmentTree from './useDepartmentTree';
-import { getUserName } from '../../../utils/cookie/cookieUtils';
+import useUserName from '../../../utils/cookie/useUserName'; 
 
 const useUserConfig = () => {
   const [form] = Form.useForm();
@@ -11,7 +11,7 @@ const useUserConfig = () => {
   const [loading, setLoading] = useState(false); // 添加loading状态
   
   // 直接从 cookie 获取用户名
-  const userName = getUserName();
+  const userName = useUserName();
   
   // 使用分离出来的部门树 hook
   const {

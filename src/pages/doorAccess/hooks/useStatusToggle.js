@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { message } from 'antd';
-import { getUserName } from '../../../utils/cookie/cookieUtils';
+import useUserName from '../../../utils/cookie/useUserName';
 
 function useStatusToggle(fetchDoorData) {
   const [statusLoading, setStatusLoading] = useState(false);
-  const userName = getUserName();
+  const userName = useUserName();
   // 处理状态切换
   const handleStatusToggle = async (record, checked) => {
     setStatusLoading(true);

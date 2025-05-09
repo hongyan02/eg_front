@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { message } from 'antd';
-import { getUserName } from '../../../utils/cookie/cookieUtils';
+import useUserName from '../../../utils/cookie/useUserName';
 
 function useAddDoor(fetchDoorData) {
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const userName = getUserName();
+  const userName = useUserName();
 
   // 打开新增模态框
   const handleAddDoor = () => {

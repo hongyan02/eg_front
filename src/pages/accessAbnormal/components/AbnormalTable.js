@@ -224,7 +224,7 @@ const AbnormalTable = ({ searchParams }) => {
           showQuickJumper: true,
           showTotal: (total) => `共 ${total} 条记录`,
           defaultPageSize: 10,
-          total: tableTotal, // 使用本地状态的 tableTotal
+          total: tableTotal, 
         }}
       />
     </div>

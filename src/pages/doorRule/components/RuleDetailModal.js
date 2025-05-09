@@ -63,19 +63,21 @@ const RuleDetailModal = ({ visible, onCancel, record }) => {
     const scheduleInt = parseInt(record.rawData.work_schedule);
     const scheduleBinary = scheduleInt.toString(2).padStart(8, '0');
     
+    // 二进制位从左到右: 0(最高位), 周日, 周一, 周二, 周三, 周四, 周五, 周六
     const dayMap = {
-      1: '周一',
-      2: '周二',
-      3: '周三',
-      4: '周四',
-      5: '周五',
-      6: '周六',
-      7: '周日'
+      '1': '周日',
+      '2': '周一',
+      '3': '周二',
+      '4': '周三',
+      '5': '周四',
+      '6': '周五',
+      '7': '周六'
     };
     
     const days = [];
+    // 从第1位(索引为1)开始，对应周日，到第7位(索引为7)，对应周六
     for (let i = 1; i <= 7; i++) {
-      if (scheduleBinary.charAt(8-i) === '1') {
+      if (scheduleBinary.charAt(i) === '1') {
         days.push(dayMap[i]);
       }
     }

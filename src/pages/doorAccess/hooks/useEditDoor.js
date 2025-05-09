@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { message } from 'antd';
-import { getUserName } from '../../../utils/cookie/cookieUtils';
+import useUserName from '../../../utils/cookie/useUserName';
 
 function useEditDoor(fetchDoorData) {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const userName = getUserName();
+  const userName = useUserName();
 
   // 处理编辑
   const handleEdit = (record) => {

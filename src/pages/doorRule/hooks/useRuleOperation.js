@@ -40,12 +40,12 @@ const useRuleOperation = (onSuccess, onError) => {
     let scheduleBinary = '';
     scheduleBinary += '0'; // 最高位为0
     scheduleBinary += schedule.includes('sun') ? '1' : '0'; // 周日
-    scheduleBinary += schedule.includes('sat') ? '1' : '0'; // 周六
-    scheduleBinary += schedule.includes('fri') ? '1' : '0'; // 周五
-    scheduleBinary += schedule.includes('thu') ? '1' : '0'; // 周四
-    scheduleBinary += schedule.includes('wed') ? '1' : '0'; // 周三
-    scheduleBinary += schedule.includes('tue') ? '1' : '0'; // 周二
     scheduleBinary += schedule.includes('mon') ? '1' : '0'; // 周一
+    scheduleBinary += schedule.includes('tue') ? '1' : '0'; // 周二
+    scheduleBinary += schedule.includes('wed') ? '1' : '0'; // 周三
+    scheduleBinary += schedule.includes('thu') ? '1' : '0'; // 周四
+    scheduleBinary += schedule.includes('fri') ? '1' : '0'; // 周五
+    scheduleBinary += schedule.includes('sat') ? '1' : '0'; // 周六
     
     // 将二进制字符串转换为整数
     const scheduleInt = parseInt(scheduleBinary, 2);
@@ -178,8 +178,8 @@ const useRuleOperation = (onSuccess, onError) => {
         // 如果values中没有schedule，但rawData中有work_schedule，直接使用
         scheduleInt = parseInt(values.rawData.work_schedule);
       } else {
-        // 默认值：周一到周五 (31)
-        scheduleInt = 31;
+        // 默认值：周一到周五 (62)
+        scheduleInt = 62;
       }
       
       // 处理例外时间段

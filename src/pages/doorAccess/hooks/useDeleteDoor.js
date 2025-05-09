@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { message } from 'antd';
-import { getUserName } from '../../../utils/cookie/cookieUtils';
+import useUserName from '../../../utils/cookie/useUserName';
 
 function useDeleteDoor(doorData, setDoorData, fetchDoorData) {
   const [deleteLoading, setDeleteLoading] = useState(false);
   
-  const userName = getUserName();
+  const userName = useUserName();
   // 处理删除
   const handleDelete = async (key) => {
     setDeleteLoading(true);
